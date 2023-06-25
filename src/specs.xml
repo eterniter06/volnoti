@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <node name="/uk/ac/cam/db538/VolumeNotifications">
   <interface name="uk.ac.cam.db538.VolumeNotification">
     <method name="notify">
-      <arg type="i" name="volume" direction="in" />
-      <arg type="b" name="muted" direction="in" />
+      <arg type="i" name="volume" direction="in"/>
+      <arg type="i" name="muted" direction="in"/>
+      <arg type="b" name="brightness" direction="in"/>
     </method>
   </interface>
 </node>
