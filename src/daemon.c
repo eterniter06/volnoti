@@ -11,11 +11,11 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <glib.h>
@@ -27,13 +27,15 @@
 
 #define IMAGE_PATH   PREFIX
 
-typedef struct {
+typedef struct
+{
     GObject parent;
 
     gint volume;
     gboolean muted;
     gboolean micmuted;
     gboolean micunmuted;
+    gboolean brightness;
 
     GtkWindow *notification;
 
@@ -44,6 +46,7 @@ typedef struct {
     GdkPixbuf *icon_muted;
     GdkPixbuf *icon_micon;
     GdkPixbuf *icon_micmuted;
+    GdkPixbuf *icon_brightness;
 
     GdkPixbuf *image_progressbar_empty;
     GdkPixbuf *image_progressbar_full;
@@ -57,15 +60,17 @@ typedef struct {
     Settings settings;
 } VolumeObject;
 
-typedef struct {
-  GObjectClass parent;
+typedef struct
+{
+    GObjectClass parent;
 } VolumeObjectClass;
 
 GType volume_object_get_type(void);
-gboolean volume_object_notify(VolumeObject* obj,
+gboolean volume_object_notify(VolumeObject *obj,
                               gint value_in,
-                              int muted,
-                              GError** error);
+                              gboolean muted,
+                              gboolean brightness,
+                              GError **error);
 
 #define VOLUME_TYPE_OBJECT \
         (volume_object_get_type())
@@ -89,12 +94,14 @@ G_DEFINE_TYPE(VolumeObject, volume_object, G_TYPE_OBJECT)
 
 #include "value-daemon-stub.h"
 
-static void volume_object_init(VolumeObject* obj) {
+static void volume_object_init(VolumeObject *obj)
+{
     g_assert(obj != NULL);
     obj->notification = NULL;
 }
 
-static void volume_object_class_init(VolumeObjectClass* klass) {
+static void volume_object_class_init(VolumeObjectClass *klass)
+{
     g_assert(klass != NULL);
 
     dbus_g_object_type_install_info(VOLUME_TYPE_OBJECT,
@@ -108,7 +115,8 @@ time_handler(VolumeObject *obj)
 
     obj->time_left--;
 
-    if (obj->time_left <= 0) {
+    if (obj->time_left <= 0)
+    {
         print_debug("Destroying notification...", obj->debug);
         destroy_notification(obj->notification);
         obj->notification = NULL;
@@ -119,33 +127,44 @@ time_handler(VolumeObject *obj)
     return TRUE;
 }
 
-gboolean volume_object_notify(VolumeObject* obj,
+gboolean volume_object_notify(VolumeObject *obj,
                               gint value,
-                              int muted,
-                              GError** error) {
+                              gboolean muted,
+                              gboolean brightness,
+                              GError **error)
+{
     g_assert(obj != NULL);
 
-    if (muted == VOL_MUTED) {
-      obj->muted = TRUE;
-      obj->micmuted = FALSE;
-      obj->micunmuted = FALSE;
-    } else if ( muted == MIC_MUTED ) {
-      obj->muted = FALSE;
-      obj->micunmuted = FALSE;
-      obj->micmuted = TRUE;
-    } else if ( muted == MIC_UNMUTED ) {
-      obj->muted = FALSE;
-      obj->micunmuted = TRUE;
-      obj->micmuted = FALSE;
-    } else {
-      obj->muted = FALSE;
-      obj->micmuted = FALSE;
-      obj->micunmuted = FALSE;
+    if (muted == VOL_MUTED)
+    {
+        obj->muted = TRUE;
+        obj->micmuted = FALSE;
+        obj->micunmuted = FALSE;
     }
-  
+    else if ( muted == MIC_MUTED )
+    {
+        obj->muted = FALSE;
+        obj->micunmuted = FALSE;
+        obj->micmuted = TRUE;
+    }
+    else if ( muted == MIC_UNMUTED )
+    {
+        obj->muted = FALSE;
+        obj->micunmuted = TRUE;
+        obj->micmuted = FALSE;
+    }
+    else
+    {
+        obj->muted = FALSE;
+        obj->micmuted = FALSE;
+        obj->micunmuted = FALSE;
+    }
+
+    obj->brightness = brightness ? TRUE : FALSE;
     obj->volume = (value > 100) ? 100 : value;
 
-    if (obj->notification == NULL) {
+    if (obj->notification == NULL)
+    {
         print_debug("Creating new notification...", obj->debug);
         obj->notification = create_notification(obj->settings);
         gtk_widget_realize(GTK_WIDGET(obj->notification));
@@ -154,20 +173,22 @@ gboolean volume_object_notify(VolumeObject* obj,
     }
 
     // choose icon
-    if (obj->muted)
+    if (obj->brightness)
+        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_brightness);
+    else if (obj->muted)
         set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_muted);
     else if (obj->micmuted)
-      set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_micmuted);
+        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_micmuted);
     else if (obj->micunmuted)
-      set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_micon);
+        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_micon);
     else if (obj->volume >= 75)
-      set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_high);
+        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_high);
     else if (obj->volume >= 50)
-      set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_medium);
+        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_medium);
     else if (obj->volume >= 25)
-      set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_low);
+        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_low);
     else
-      set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_off);
+        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_off);
 
     // prepare and set progress bar
     gint width_full = obj->width_progressbar * obj->volume / 100;
@@ -183,7 +204,8 @@ gboolean volume_object_notify(VolumeObject* obj,
     return TRUE;
 }
 
-static void print_usage(const char* filename, int failure) {
+static void print_usage(const char *filename, int failure)
+{
     Settings settings = get_default_settings();
     g_print("Usage: %s [arguments]\n"
             " -h\t\t--help\t\t\thelp\n"
@@ -195,39 +217,44 @@ static void print_usage(const char* filename, int failure) {
             " -a <float>\t--alpha <float>\t\ttransparency level (0.0 - 1.0, default %.2f)\n"
             " -r <int>\t--corner-radius <int>\tradius of the round corners in pixels (default %d)\n"
             , filename, settings.alpha, settings.corner_radius);
+
     if (failure)
         exit(EXIT_FAILURE);
     else
         exit(EXIT_SUCCESS);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     Settings settings = get_default_settings();
     int timeout = 3;
-    
-    void *options = gopt_sort(&argc, (const char**) argv, gopt_start(
-            gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")),
-            gopt_option('n', 0, gopt_shorts('n'), gopt_longs("no-daemon")),
-            gopt_option('t', GOPT_ARG, gopt_shorts('t'), gopt_longs("timeout")),
-            gopt_option('a', GOPT_ARG, gopt_shorts('a'), gopt_longs("alpha")),
-            gopt_option('r', GOPT_ARG, gopt_shorts('r'), gopt_longs("corner-radius")),
-            gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
+
+    void *options = gopt_sort(&argc, (const char **) argv, gopt_start(
+                                  gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")),
+                                  gopt_option('n', 0, gopt_shorts('n'), gopt_longs("no-daemon")),
+                                  gopt_option('t', GOPT_ARG, gopt_shorts('t'), gopt_longs("timeout")),
+                                  gopt_option('a', GOPT_ARG, gopt_shorts('a'), gopt_longs("alpha")),
+                                  gopt_option('r', GOPT_ARG, gopt_shorts('r'), gopt_longs("corner-radius")),
+                                  gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
 
     int help = gopt(options, 'h');
     int debug = gopt(options, 'v');
     int no_daemon = gopt(options, 'n');
 
-    if (gopt(options, 't')) {
+    if (gopt(options, 't'))
+    {
         if (sscanf(gopt_arg_i(options, 't', 0), "%d", &timeout) != 1)
             print_usage(argv[0], TRUE);
     }
-    
-    if (gopt(options, 'a')) {
+
+    if (gopt(options, 'a'))
+    {
         if (sscanf(gopt_arg_i(options, 'a', 0), "%f", &settings.alpha) != 1 || settings.alpha < 0.0f || settings.alpha > 1.0f)
             print_usage(argv[0], TRUE);
     }
 
-    if (gopt(options, 'r')) {
+    if (gopt(options, 'r'))
+    {
         if (sscanf(gopt_arg_i(options, 'r', 0), "%d", &settings.corner_radius) != 1)
             print_usage(argv[0], TRUE);
     }
@@ -251,32 +278,38 @@ int main(int argc, char* argv[]) {
 
     // create main loop
     main_loop = g_main_loop_new(NULL, FALSE);
+
     if (main_loop == NULL)
         handle_error("Couldn't create GMainLoop", "Unknown(OOM?)", TRUE);
-    
+
     // connect to D-Bus
     print_debug("Connecting to D-Bus...", debug);
     bus = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
+
     if (error != NULL)
         handle_error("Couldn't connect to D-Bus",
-                    error->message,
-                    TRUE);
+                     error->message,
+                     TRUE);
+
     print_debug_ok(debug);
 
     // get the proxy
     print_debug("Getting proxy...", debug);
     bus_proxy = dbus_g_proxy_new_for_name(bus,
-                                         DBUS_SERVICE_DBUS,
-                                         DBUS_PATH_DBUS,
-                                         DBUS_INTERFACE_DBUS);
+                                          DBUS_SERVICE_DBUS,
+                                          DBUS_PATH_DBUS,
+                                          DBUS_INTERFACE_DBUS);
+
     if (bus_proxy == NULL)
         handle_error("Couldn't get a proxy for D-Bus",
-                    "Unknown(dbus_g_proxy_new_for_name)",
-                    TRUE);
+                     "Unknown(dbus_g_proxy_new_for_name)",
+                     TRUE);
+
     print_debug_ok(debug);
 
     // register the service
     print_debug("Registering the service...", debug);
+
     if (!dbus_g_proxy_call(bus_proxy,
                            "RequestName",
                            &error,
@@ -291,19 +324,22 @@ int main(int argc, char* argv[]) {
                            &result,
                            G_TYPE_INVALID))
         handle_error("D-Bus.RequestName RPC failed",
-                  error->message,
-                  TRUE);
+                     error->message,
+                     TRUE);
+
     if (result != 1)
         handle_error("Failed to get the primary well-known name.",
-                    "RequestName result != 1", TRUE);
+                     "RequestName result != 1", TRUE);
+
     print_debug_ok(debug);
 
     // create the Volume object
     print_debug("Preparing data...", debug);
     status = g_object_new(VOLUME_TYPE_OBJECT, NULL);
+
     if (status == NULL)
         handle_error("Failed to create one VolumeObject instance.",
-                    "Unknown(OOM?)", TRUE);
+                     "Unknown(OOM?)", TRUE);
 
     status->debug = debug;
     status->timeout = timeout;
@@ -311,49 +347,70 @@ int main(int argc, char* argv[]) {
 
     // volume icons
     status->icon_high = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_high.svg", &error);
+
     if (error != NULL)
         handle_error("Couldn't load volume_high.svg.", error->message, TRUE);
+
     status->icon_medium = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_medium.svg", &error);
+
     if (error != NULL)
         handle_error("Couldn't load volume_medium.svg.", error->message, TRUE);
+
     status->icon_low = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_low.svg", &error);
+
     if (error != NULL)
         handle_error("Couldn't load volume_low.svg.", error->message, TRUE);
+
     status->icon_off = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_off.svg", &error);
+
     if (error != NULL)
         handle_error("Couldn't load volume_off.svg.", error->message, TRUE);
+
     status->icon_muted = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_muted.svg", &error);
+
     if (error != NULL)
         handle_error("Couldn't load volume_muted.svg.", error->message, TRUE);
+
     status->icon_micmuted = gdk_pixbuf_new_from_file(IMAGE_PATH "mic_muted.svg", &error);
+
     if (error != NULL)
         handle_error("Couldn't load mic_muted.svg.", error->message, TRUE);
+
     status->icon_micon = gdk_pixbuf_new_from_file(IMAGE_PATH "mic_on.svg", &error);
+
     if (error != NULL)
         handle_error("Couldn't load mic_on.svg.", error->message, TRUE);
-    
+
+    status->icon_brightness = gdk_pixbuf_new_from_file(IMAGE_PATH "brightness.svg", &error);
+
+    if (error != NULL)
+        handle_error("Couldn't load brightness.svg.", error->message, TRUE);
+
     // progress bar
     status->image_progressbar_empty = gdk_pixbuf_new_from_file(IMAGE_PATH "progressbar_empty.png", &error);
+
     if (error != NULL)
         handle_error("Couldn't load progressbar_empty.png.", error->message, TRUE);
+
     status->image_progressbar_full = gdk_pixbuf_new_from_file(IMAGE_PATH "progressbar_full.png", &error);
+
     if (error != NULL)
         handle_error("Couldn't load progressbar_full.png.", error->message, TRUE);
 
     // check that the images are of the same size
     if (gdk_pixbuf_get_width(status->image_progressbar_empty) != gdk_pixbuf_get_width(status->image_progressbar_full) ||
-        gdk_pixbuf_get_height(status->image_progressbar_empty) != gdk_pixbuf_get_height(status->image_progressbar_full) ||
-        gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty) != gdk_pixbuf_get_bits_per_sample(status->image_progressbar_full))
+            gdk_pixbuf_get_height(status->image_progressbar_empty) != gdk_pixbuf_get_height(status->image_progressbar_full) ||
+            gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty) != gdk_pixbuf_get_bits_per_sample(status->image_progressbar_full))
         handle_error("Progress bar images aren't of the same size or don't have the same number of bits per sample.", "Unknown(OOM?)", TRUE);
 
     // create pixbuf for combined image
     status->width_progressbar = gdk_pixbuf_get_width(status->image_progressbar_empty);
     status->height_progressbar = gdk_pixbuf_get_height(status->image_progressbar_empty);
     status->image_progressbar = gdk_pixbuf_new(GDK_COLORSPACE_RGB,
-                                               TRUE,
-                                               gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty),
-                                               status->width_progressbar,
-                                               status->height_progressbar);
+                                TRUE,
+                                gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty),
+                                status->width_progressbar,
+                                status->height_progressbar);
 
     print_debug_ok(debug);
 
@@ -365,8 +422,10 @@ int main(int argc, char* argv[]) {
     print_debug_ok(debug);
 
     // daemonize
-    if (!no_daemon) {
+    if (!no_daemon)
+    {
         print_debug("Daemonizing...\n", debug);
+
         if (daemon(0, 0) != 0)
             handle_error("failed to daemonize", "unknown", FALSE);
     }
