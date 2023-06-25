@@ -20,7 +20,7 @@ Arch Linux - Modified PKGBUILD based on the package in the [AUR](https://aur.arc
 # Modified by
 # Himanshu <himanshuhimsurya@gmail.com>
 # Difference: Uses a fork of the repo incorporating some pull requests lying on the original repo
-# Features pulled: Brightness and Mic mute/unmute
+# Features pulled: Brightness, Mic mute/unmute and single decimal timeout support, e.g. 1.3
 
 pkgname=volnoti
 pkgver=0.1
