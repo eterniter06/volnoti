@@ -168,7 +168,7 @@ gboolean volume_object_notify(VolumeObject *obj,
         print_debug("Creating new notification...", obj->debug);
         obj->notification = create_notification(obj->settings);
         gtk_widget_realize(GTK_WIDGET(obj->notification));
-        g_timeout_add(1000, (GSourceFunc) time_handler, (gpointer) obj);
+        g_timeout_add(100, (GSourceFunc) time_handler, (gpointer) obj);
         print_debug_ok(obj->debug);
     }
 
@@ -213,7 +213,7 @@ static void print_usage(const char *filename, int failure)
             " -n\t\t--no-daemon\t\tdo not daemonize\n"
             "\n"
             "Configuration:\n"
-            " -t <int>\t--timeout <int>\t\tnotification timeout in seconds\n"
+            " -t <float>\t--timeout <float>\t\tnotification timeout in seconds with one optional decimal place\n"
             " -a <float>\t--alpha <float>\t\ttransparency level (0.0 - 1.0, default %.2f)\n"
             " -r <int>\t--corner-radius <int>\tradius of the round corners in pixels (default %d)\n"
             , filename, settings.alpha, settings.corner_radius);
@@ -227,7 +227,7 @@ static void print_usage(const char *filename, int failure)
 int main(int argc, char *argv[])
 {
     Settings settings = get_default_settings();
-    int timeout = 3;
+    int timeout = 30;       // in ms
 
     void *options = gopt_sort(&argc, (const char **) argv, gopt_start(
                                   gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")),
@@ -241,9 +241,13 @@ int main(int argc, char *argv[])
     int debug = gopt(options, 'v');
     int no_daemon = gopt(options, 'n');
 
+    float timeout_in;   // cmd argument. Unused if unsupplied. Uninitialization is safe (for now)
+
     if (gopt(options, 't'))
     {
-        if (sscanf(gopt_arg_i(options, 't', 0), "%d", &timeout) != 1)
+        if (sscanf(gopt_arg_i(options, 't', 0), "%f", &timeout_in) == 1 && timeout_in > 0.0f)
+            timeout = (int) (timeout_in * 10);
+        else
             print_usage(argv[0], TRUE);
     }
 
