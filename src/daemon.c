@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
                      TRUE);
 
     if (result != 1)
-        handle_error("Failed to get the primary well-known name.",
+        handle_error("Failed to get the primary well-known name. Possible cause: An instance of volnoti may already be running",
                      "RequestName result != 1", TRUE);
 
     print_debug_ok(debug);
