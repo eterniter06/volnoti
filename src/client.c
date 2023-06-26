@@ -32,10 +32,10 @@ static void print_usage(const char *filename, int failure)
     g_print("Usage: %s [-v] [-m] <value>\n"
             " -h\t--help\t\thelp\n"
             " -v\t--verbose\tverbose\n"
-            " -m\t--mute\tvolume muted\n"
+            " -m\t--mute\t\tvolume muted\n"
             " -c\t--micmute\tmicrophone muted\n"
             " -u\t--micunmute\tmicrophone unmuted\n"
-            " -b\t--brightness\t\tdisplay brightness\n"
+            " -b\t--brightness\tdisplay brightness\n"
             " <value>\t\tint 0-100\n", filename);
 
     if (failure)

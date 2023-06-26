@@ -54,6 +54,6 @@ size_t gopt_args( const void *opts, int key, const char **args, size_t args_len 
  */
 void gopt_free( void *opts );
 /* releases memory allocated in the corresponding call to gopt_sort()
- * opts can no longer be used 
+ * opts can no longer be used
  */
 #endif /* GOPT_H_INCLUDED */

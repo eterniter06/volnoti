@@ -11,11 +11,11 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #ifndef INCLUDE_COMMON_DEFS_H
 #define INCLUDE_COMMON_DEFS_H
 
@@ -28,7 +28,7 @@
 #define MIC_MUTED 2
 #define MIC_UNMUTED 3
 
-void handle_error(const char* msg, const char* reason, gboolean fatal);
+void handle_error(const char *msg, const char *reason, gboolean fatal);
 void print_debug(const gchar *msg, int debug);
 void print_debug_ok(int debug);
 

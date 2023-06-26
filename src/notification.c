@@ -14,11 +14,11 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #include "notification.h"
 
 #define USE_COMPOSITE
@@ -35,7 +35,8 @@
 #define MAX_ICON_SIZE           IMAGE_SIZE
 #define MAX_PROGRESSBAR_SIZE    (IMAGE_SIZE * 18 / 10)
 
-typedef struct {
+typedef struct
+{
     GtkWidget *win;
     GtkWidget *main_vbox;
     GtkWidget *iconbox;
@@ -53,7 +54,8 @@ typedef struct {
 } WindowData;
 
 Settings
-get_default_settings() {
+get_default_settings()
+{
     Settings settings;
     settings.alpha = 0.5f;
     settings.corner_radius = 30;
@@ -61,7 +63,8 @@ get_default_settings() {
 }
 
 static void
-color_reverse(const GdkColor *a, GdkColor *b) {
+color_reverse(const GdkColor *a, GdkColor *b)
+{
     gdouble red;
     gdouble green;
     gdouble blue;
@@ -77,6 +80,7 @@ color_reverse(const GdkColor *a, GdkColor *b) {
 
     /* pivot brightness around the center */
     v = 0.5 + (0.5 - v);
+
     if (v > 1.0)
         v = 1.0;
     else if (v < 0.0)
@@ -98,49 +102,51 @@ scale_pixbuf (GdkPixbuf *pixbuf,
               int        max_height,
               gboolean   no_stretch_hint)
 {
-        int        pw;
-        int        ph;
-        float      scale_factor_x = 1.0;
-        float      scale_factor_y = 1.0;
-        float      scale_factor = 1.0;
+    int        pw;
+    int        ph;
+    float      scale_factor_x = 1.0;
+    float      scale_factor_y = 1.0;
+    float      scale_factor = 1.0;
 
-        pw = gdk_pixbuf_get_width (pixbuf);
-        ph = gdk_pixbuf_get_height (pixbuf);
+    pw = gdk_pixbuf_get_width (pixbuf);
+    ph = gdk_pixbuf_get_height (pixbuf);
 
-        /* Determine which dimension requires the smallest scale. */
-        scale_factor_x = (float) max_width / (float) pw;
-        scale_factor_y = (float) max_height / (float) ph;
+    /* Determine which dimension requires the smallest scale. */
+    scale_factor_x = (float) max_width / (float) pw;
+    scale_factor_y = (float) max_height / (float) ph;
 
-        if (scale_factor_x > scale_factor_y) {
-                scale_factor = scale_factor_y;
-        } else {
-                scale_factor = scale_factor_x;
-        }
+    if (scale_factor_x > scale_factor_y)
+        scale_factor = scale_factor_y;
 
-        /* always scale down, allow to disable scaling up */
-        if (scale_factor < 1.0 || !no_stretch_hint) {
-                int scale_x;
-                int scale_y;
+    else
+        scale_factor = scale_factor_x;
 
-                scale_x = (int) (pw * scale_factor);
-                scale_y = (int) (ph * scale_factor);
-                return gdk_pixbuf_scale_simple (pixbuf,
-                                                scale_x,
-                                                scale_y,
-                                                GDK_INTERP_BILINEAR);
-        } else {
-                return g_object_ref (pixbuf);
-        }
+    /* always scale down, allow to disable scaling up */
+    if (scale_factor < 1.0 || !no_stretch_hint)
+    {
+        int scale_x;
+        int scale_y;
+
+        scale_x = (int) (pw * scale_factor);
+        scale_y = (int) (ph * scale_factor);
+        return gdk_pixbuf_scale_simple (pixbuf,
+                                        scale_x,
+                                        scale_y,
+                                        GDK_INTERP_BILINEAR);
+    }
+    else
+        return g_object_ref (pixbuf);
 }
 
 static void
-draw_round_rect(cairo_t* cr,
+draw_round_rect(cairo_t *cr,
                 gdouble  aspect,
                 gdouble  x,
                 gdouble  y,
                 gdouble  corner_radius,
                 gdouble  width,
-                gdouble  height) {
+                gdouble  height)
+{
     gdouble radius = corner_radius / aspect;
 
     cairo_move_to (cr, x + radius, y);
@@ -199,7 +205,8 @@ draw_round_rect(cairo_t* cr,
 }
 
 static void
-fill_background(GtkWidget *widget, WindowData *windata, cairo_t *cr) {
+fill_background(GtkWidget *widget, WindowData *windata, cairo_t *cr)
+{
     GdkColor  color;
     double    r, g, b;
 
@@ -219,33 +226,35 @@ fill_background(GtkWidget *widget, WindowData *windata, cairo_t *cr) {
     cairo_fill_preserve (cr);
 
     // border
-//  color = widget->style->text_aa [GTK_STATE_NORMAL];
-//  r = (float) color.red / 65535.0;
-//  g = (float) color.green / 65535.0;
-//  b = (float) color.blue / 65535.0;
-//  cairo_set_source_rgba (cr, r, g, b, BACKGROUND_ALPHA / 2);
-//  cairo_set_line_width (cr, 1);
-//  cairo_stroke (cr);
+    //  color = widget->style->text_aa [GTK_STATE_NORMAL];
+    //  r = (float) color.red / 65535.0;
+    //  g = (float) color.green / 65535.0;
+    //  b = (float) color.blue / 65535.0;
+    //  cairo_set_source_rgba (cr, r, g, b, BACKGROUND_ALPHA / 2);
+    //  cairo_set_line_width (cr, 1);
+    //  cairo_stroke (cr);
 }
 
 static void
-update_shape(WindowData *windata) {
+update_shape(WindowData *windata)
+{
     GdkBitmap *mask;
     cairo_t   *cr;
 
     if (windata->width == windata->last_width
-        && windata->height == windata->last_height) {
-            return;
+            && windata->height == windata->last_height)
+        return;
+
+    if (windata->width == 0 || windata->height == 0)
+    {
+        windata->width = MAX(windata->win->allocation.width, 1);
+        windata->height = MAX(windata->win->allocation.height, 1);
     }
 
-    if (windata->width == 0 || windata->height == 0) {
-            windata->width = MAX(windata->win->allocation.width, 1);
-            windata->height = MAX(windata->win->allocation.height, 1);
-    }
-
-    if (windata->composited) {
-            gtk_widget_shape_combine_mask (windata->win, NULL, 0, 0);
-            return;
+    if (windata->composited)
+    {
+        gtk_widget_shape_combine_mask (windata->win, NULL, 0, 0);
+        return;
     }
 
     windata->last_width = windata->width;
@@ -254,28 +263,31 @@ update_shape(WindowData *windata) {
                                          windata->width,
                                          windata->height,
                                          1);
-    if (mask == NULL) {
-            return;
-    }
+
+    if (mask == NULL)
+        return;
 
     cr = gdk_cairo_create (mask);
-    if (cairo_status (cr) == CAIRO_STATUS_SUCCESS) {
-            cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
-            cairo_paint (cr);
 
-            cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
-            cairo_set_source_rgb (cr, 1.0f, 1.0f, 1.0f);
-            draw_round_rect (cr,
-                             1.0f,
-                             DEFAULT_X0,
-                             DEFAULT_Y0,
-                             windata->settings.corner_radius,
-                             windata->width,
-                             windata->height);
-            cairo_fill (cr);
+    if (cairo_status (cr) == CAIRO_STATUS_SUCCESS)
+    {
+        cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+        cairo_paint (cr);
 
-            gtk_widget_shape_combine_mask (windata->win, mask, 0, 0);
+        cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+        cairo_set_source_rgb (cr, 1.0f, 1.0f, 1.0f);
+        draw_round_rect (cr,
+                         1.0f,
+                         DEFAULT_X0,
+                         DEFAULT_Y0,
+                         windata->settings.corner_radius,
+                         windata->width,
+                         windata->height);
+        cairo_fill (cr);
+
+        gtk_widget_shape_combine_mask (windata->win, mask, 0, 0);
     }
+
     cairo_destroy (cr);
 
     g_object_unref (mask);
@@ -283,14 +295,16 @@ update_shape(WindowData *windata) {
 
 
 static void
-paint_window(GtkWidget *widget, WindowData *windata) {
+paint_window(GtkWidget *widget, WindowData *windata)
+{
     cairo_t         *context;
     cairo_surface_t *surface;
     cairo_t         *cr;
 
-    if (windata->width == 0 || windata->height == 0) {
-            windata->width = MAX (windata->win->allocation.width, 1);
-            windata->height = MAX (windata->win->allocation.height, 1);
+    if (windata->width == 0 || windata->height == 0)
+    {
+        windata->width = MAX (windata->win->allocation.width, 1);
+        windata->height = MAX (windata->win->allocation.height, 1);
     }
 
     context = gdk_cairo_create (widget->window);
@@ -314,52 +328,62 @@ paint_window(GtkWidget *widget, WindowData *windata) {
 }
 
 static void
-override_style(GtkWidget *widget, GtkStyle  *previous_style) {
+override_style(GtkWidget *widget, GtkStyle  *previous_style)
+{
     GtkStateType state;
     GtkStyle    *style;
     GdkColor     fg;
     GdkColor     bg;
 
     style = gtk_style_copy (widget->style);
-    if (previous_style == NULL
-        || (previous_style != NULL
-            && (previous_style->bg[GTK_STATE_NORMAL].red != style->bg[GTK_STATE_NORMAL].red
-                || previous_style->bg[GTK_STATE_NORMAL].green != style->bg[GTK_STATE_NORMAL].green
-                || previous_style->bg[GTK_STATE_NORMAL].blue != style->bg[GTK_STATE_NORMAL].blue))) {
 
-            state = (GtkStateType) 0;
-            while (state < (GtkStateType) G_N_ELEMENTS (widget->style->bg))  {
-                color_reverse (&style->bg[state], &bg);
-                gtk_widget_modify_bg (widget, state, &bg);
-                state++;
-            }
+    if (previous_style == NULL
+            || (previous_style != NULL
+                && (previous_style->bg[GTK_STATE_NORMAL].red != style->bg[GTK_STATE_NORMAL].red
+                    || previous_style->bg[GTK_STATE_NORMAL].green != style->bg[GTK_STATE_NORMAL].green
+                    || previous_style->bg[GTK_STATE_NORMAL].blue != style->bg[GTK_STATE_NORMAL].blue)))
+    {
+
+        state = (GtkStateType) 0;
+
+        while (state < (GtkStateType) G_N_ELEMENTS (widget->style->bg))
+        {
+            color_reverse (&style->bg[state], &bg);
+            gtk_widget_modify_bg (widget, state, &bg);
+            state++;
+        }
 
     }
 
     if (previous_style == NULL
-        || (previous_style != NULL
-            && (previous_style->fg[GTK_STATE_NORMAL].red != style->fg[GTK_STATE_NORMAL].red
-                || previous_style->fg[GTK_STATE_NORMAL].green != style->fg[GTK_STATE_NORMAL].green
-                || previous_style->fg[GTK_STATE_NORMAL].blue != style->fg[GTK_STATE_NORMAL].blue))) {
+            || (previous_style != NULL
+                && (previous_style->fg[GTK_STATE_NORMAL].red != style->fg[GTK_STATE_NORMAL].red
+                    || previous_style->fg[GTK_STATE_NORMAL].green != style->fg[GTK_STATE_NORMAL].green
+                    || previous_style->fg[GTK_STATE_NORMAL].blue != style->fg[GTK_STATE_NORMAL].blue)))
+    {
 
-            state = (GtkStateType) 0;
-            while (state < (GtkStateType) G_N_ELEMENTS (widget->style->fg)) {
-                color_reverse (&style->fg[state], &fg);
-                gtk_widget_modify_fg (widget, state, &fg);
-                state++;
-            }
+        state = (GtkStateType) 0;
+
+        while (state < (GtkStateType) G_N_ELEMENTS (widget->style->fg))
+        {
+            color_reverse (&style->fg[state], &fg);
+            gtk_widget_modify_fg (widget, state, &fg);
+            state++;
+        }
     }
 
     g_object_unref (style);
 }
 
 static void
-destroy_windata(WindowData *windata) {
+destroy_windata(WindowData *windata)
+{
     g_free (windata);
 }
 
 static gboolean
-on_configure_event(GtkWidget *widget, GdkEventConfigure *event, WindowData *windata) {
+on_configure_event(GtkWidget *widget, GdkEventConfigure *event, WindowData *windata)
+{
     windata->width = event->width;
     windata->height = event->height;
 
@@ -369,7 +393,8 @@ on_configure_event(GtkWidget *widget, GdkEventConfigure *event, WindowData *wind
 }
 
 static void
-on_style_set(GtkWidget *widget, GtkStyle *previous_style, WindowData *windata) {
+on_style_set(GtkWidget *widget, GtkStyle *previous_style, WindowData *windata)
+{
     g_signal_handlers_block_by_func (G_OBJECT(widget), on_style_set, windata);
     override_style (widget, previous_style);
 
@@ -379,27 +404,32 @@ on_style_set(GtkWidget *widget, GtkStyle *previous_style, WindowData *windata) {
 }
 
 static void
-on_composited_changed(GtkWidget  *window, WindowData *windata) {
+on_composited_changed(GtkWidget  *window, WindowData *windata)
+{
     windata->composited = gdk_screen_is_composited (gtk_widget_get_screen (window));
     update_shape(windata);
 }
 
 static void
-on_window_realize(GtkWidget  *widget, WindowData *windata) {
+on_window_realize(GtkWidget  *widget, WindowData *windata)
+{
 }
 
 static gboolean
-on_window_expose (GtkWidget *widget, GdkEventExpose *event, WindowData *windata) {
+on_window_expose (GtkWidget *widget, GdkEventExpose *event, WindowData *windata)
+{
     paint_window (widget, windata);
     return FALSE;
 }
 
 static gboolean
-on_window_map (GtkWidget  *widget, GdkEvent   *event, WindowData *windata) {
+on_window_map (GtkWidget  *widget, GdkEvent   *event, WindowData *windata)
+{
     return FALSE;
 }
 
-GtkWindow* create_notification(Settings settings) {
+GtkWindow *create_notification(Settings settings)
+{
     WindowData *windata;
 
     GtkWidget   *win;
@@ -442,12 +472,15 @@ GtkWindow* create_notification(Settings settings) {
 #ifdef USE_COMPOSITE
     screen = gtk_window_get_screen (GTK_WINDOW (win));
     colormap = gdk_screen_get_rgba_colormap (screen);
-    if (colormap != NULL) {
+
+    if (colormap != NULL)
+    {
         gtk_widget_set_colormap (win, colormap);
-        if (gdk_screen_is_composited (screen)) {
+
+        if (gdk_screen_is_composited (screen))
             windata->composited = TRUE;
-        }
     }
+
     g_signal_connect(win,
                      "composited-changed",
                      G_CALLBACK (on_composited_changed),
@@ -478,11 +511,11 @@ GtkWindow* create_notification(Settings settings) {
     gtk_container_add(GTK_CONTAINER(win), windata->main_vbox);
     gtk_container_set_border_width(GTK_CONTAINER(windata->main_vbox), DEFAULT_BORDER);
 
-//    windata->main_hbox = gtk_hbox_new (FALSE, 0);
-//    gtk_widget_show (windata->main_hbox);
-//    gtk_box_pack_start (GTK_BOX (main_vbox),
-//                        windata->main_hbox,
-//                        FALSE, FALSE, 0);
+    //    windata->main_hbox = gtk_hbox_new (FALSE, 0);
+    //    gtk_widget_show (windata->main_hbox);
+    //    gtk_box_pack_start (GTK_BOX (main_vbox),
+    //                        windata->main_hbox,
+    //                        FALSE, FALSE, 0);
 
     // icon box
     windata->iconbox = gtk_alignment_new (0.5f, 0, 0, 0);
@@ -502,8 +535,8 @@ GtkWindow* create_notification(Settings settings) {
     // progress bar box
     windata->progressbarbox = gtk_alignment_new (0.5f, 0, 0, 0);
     gtk_widget_show (windata->progressbarbox);
-//    gtk_alignment_set_padding (GTK_ALIGNMENT (windata->iconbox),
-//                               5, 0, 0, 0);
+    //    gtk_alignment_set_padding (GTK_ALIGNMENT (windata->iconbox),
+    //                               5, 0, 0, 0);
     gtk_box_pack_start (GTK_BOX (windata->main_vbox),
                         windata->progressbarbox,
                         FALSE, FALSE, 0);
@@ -518,79 +551,93 @@ GtkWindow* create_notification(Settings settings) {
 }
 
 void
-move_notification (GtkWindow *win, int x, int y) {
+move_notification (GtkWindow *win, int x, int y)
+{
     gtk_window_move(GTK_WINDOW(win), x, y);
 }
 
 void
-destroy_notification (GtkWindow *win) {
+destroy_notification (GtkWindow *win)
+{
     gtk_widget_destroy(GTK_WIDGET(win));
 }
 
 void
-set_notification_icon (GtkWindow *nw, GdkPixbuf *pixbuf) {
-        WindowData *windata;
-        GdkPixbuf  *scaled;
+set_notification_icon (GtkWindow *nw, GdkPixbuf *pixbuf)
+{
+    WindowData *windata;
+    GdkPixbuf  *scaled;
 
-        windata = g_object_get_data (G_OBJECT (nw), "windata");
+    windata = g_object_get_data (G_OBJECT (nw), "windata");
 
-        g_assert (windata != NULL);
+    g_assert (windata != NULL);
 
-        scaled = NULL;
-        if (pixbuf != NULL) {
-                scaled = scale_pixbuf (pixbuf,
-                                       MAX_ICON_SIZE,
-                                       MAX_ICON_SIZE,
-                                       TRUE);
-        }
+    scaled = NULL;
 
-        gtk_image_set_from_pixbuf (GTK_IMAGE (windata->icon), scaled);
+    if (pixbuf != NULL)
+    {
+        scaled = scale_pixbuf (pixbuf,
+                               MAX_ICON_SIZE,
+                               MAX_ICON_SIZE,
+                               TRUE);
+    }
 
-        if (scaled != NULL) {
-                int pixbuf_width = gdk_pixbuf_get_width (scaled);
+    gtk_image_set_from_pixbuf (GTK_IMAGE (windata->icon), scaled);
 
-                gtk_widget_show (windata->icon);
-                gtk_widget_set_size_request (windata->iconbox,
-                                             MAX (BODY_X_OFFSET, pixbuf_width), -1);
-                g_object_unref (scaled);
-        } else {
-                gtk_widget_hide (windata->icon);
-                gtk_widget_set_size_request (windata->iconbox,
-                                             BODY_X_OFFSET,
-                                             -1);
-        }
+    if (scaled != NULL)
+    {
+        int pixbuf_width = gdk_pixbuf_get_width (scaled);
+
+        gtk_widget_show (windata->icon);
+        gtk_widget_set_size_request (windata->iconbox,
+                                     MAX (BODY_X_OFFSET, pixbuf_width), -1);
+        g_object_unref (scaled);
+    }
+    else
+    {
+        gtk_widget_hide (windata->icon);
+        gtk_widget_set_size_request (windata->iconbox,
+                                     BODY_X_OFFSET,
+                                     -1);
+    }
 }
 
 void
-set_progressbar_image (GtkWindow *nw, GdkPixbuf *pixbuf) {
-        WindowData *windata;
-        GdkPixbuf  *scaled;
+set_progressbar_image (GtkWindow *nw, GdkPixbuf *pixbuf)
+{
+    WindowData *windata;
+    GdkPixbuf  *scaled;
 
-        windata = g_object_get_data (G_OBJECT (nw), "windata");
+    windata = g_object_get_data (G_OBJECT (nw), "windata");
 
-        g_assert (windata != NULL);
+    g_assert (windata != NULL);
 
-        scaled = NULL;
-        if (pixbuf != NULL) {
-                scaled = scale_pixbuf (pixbuf,
-                                       MAX_PROGRESSBAR_SIZE,
-                                       MAX_PROGRESSBAR_SIZE,
-                                       TRUE);
-        }
+    scaled = NULL;
 
-        gtk_image_set_from_pixbuf (GTK_IMAGE (windata->progressbar), scaled);
+    if (pixbuf != NULL)
+    {
+        scaled = scale_pixbuf (pixbuf,
+                               MAX_PROGRESSBAR_SIZE,
+                               MAX_PROGRESSBAR_SIZE,
+                               TRUE);
+    }
 
-        if (scaled != NULL) {
-                int pixbuf_width = gdk_pixbuf_get_width (scaled);
+    gtk_image_set_from_pixbuf (GTK_IMAGE (windata->progressbar), scaled);
 
-                gtk_widget_show (windata->icon);
-                gtk_widget_set_size_request (windata->progressbarbox,
-                                             MAX (BODY_X_OFFSET, pixbuf_width), -1);
-                g_object_unref (scaled);
-        } else {
-                gtk_widget_hide (windata->icon);
-                gtk_widget_set_size_request (windata->progressbarbox,
-                                             BODY_X_OFFSET,
-                                             -1);
-        }
+    if (scaled != NULL)
+    {
+        int pixbuf_width = gdk_pixbuf_get_width (scaled);
+
+        gtk_widget_show (windata->icon);
+        gtk_widget_set_size_request (windata->progressbarbox,
+                                     MAX (BODY_X_OFFSET, pixbuf_width), -1);
+        g_object_unref (scaled);
+    }
+    else
+    {
+        gtk_widget_hide (windata->icon);
+        gtk_widget_set_size_request (windata->progressbarbox,
+                                     BODY_X_OFFSET,
+                                     -1);
+    }
 }

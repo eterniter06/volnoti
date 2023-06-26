@@ -213,7 +213,7 @@ static void print_usage(const char *filename, int failure)
             " -n\t\t--no-daemon\t\tdo not daemonize\n"
             "\n"
             "Configuration:\n"
-            " -t <float>\t--timeout <float>\t\tnotification timeout in seconds with one optional decimal place\n"
+            " -t <float>\t--timeout <float>\tnotification timeout in seconds with one optional decimal place\n"
             " -a <float>\t--alpha <float>\t\ttransparency level (0.0 - 1.0, default %.2f)\n"
             " -r <int>\t--corner-radius <int>\tradius of the round corners in pixels (default %d)\n"
             , filename, settings.alpha, settings.corner_radius);

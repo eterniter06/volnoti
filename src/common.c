@@ -11,28 +11,32 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #include <stdlib.h>
 #include <glib.h>
 
 #include "common.h"
 
-void handle_error(const char* msg, const char* reason, gboolean fatal) {
+void handle_error(const char *msg, const char *reason, gboolean fatal)
+{
     g_printerr("ERROR: %s (%s)\n", msg, reason);
+
     if (fatal)
         exit(EXIT_FAILURE);
 }
 
-void print_debug(const gchar *msg, int debug) {
+void print_debug(const gchar *msg, int debug)
+{
     if (debug)
         g_print("%s", msg);
 }
 
-void print_debug_ok(int debug) {
+void print_debug_ok(int debug)
+{
     if (debug)
         g_print(" OK\n");
 }

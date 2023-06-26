@@ -11,11 +11,10 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
 #ifndef NOTIFICATION_H
 #define NOTIFICATION_H
 
@@ -23,13 +22,14 @@
 #include <cairo.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-typedef struct {
+typedef struct
+{
     gfloat alpha;
     gint corner_radius;
 } Settings;
 
 Settings get_default_settings();
-GtkWindow* create_notification(Settings settings);
+GtkWindow *create_notification(Settings settings);
 void move_notification(GtkWindow *win, int x, int y);
 void set_notification_icon(GtkWindow *nw, GdkPixbuf *pixbuf);
 void set_progressbar_image (GtkWindow *nw, GdkPixbuf *pixbuf);
