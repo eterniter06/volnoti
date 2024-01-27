@@ -155,7 +155,7 @@ easy to replace them with your favourite icons.
 
 Credits
 -------
-
+ - Brightness Icon (https://www.svgrepo.com/svg/479348/brightness)
  - Faenza Icon Set (tiheum.deviantart.com)
  - Notification-daemon (www.gnome.org)
  - Gopt (www.purposeful.co.uk/software/gopt)
