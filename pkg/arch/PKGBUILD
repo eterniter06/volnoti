@@ -9,7 +9,7 @@
 
 pkgname=volnoti
 pkgver=0.3
-pkgrel=1
+pkgrel=2
 pkgdesc='Lightweight volume notification'
 url=https://github.com/eterniter06/volnoti
 arch=(x86_64)

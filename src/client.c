@@ -32,12 +32,23 @@ static void print_usage(const char *filename, int failure)
     g_print("Usage: %s [-v] [-m] <value>\n"
             " -h\t--help\t\thelp\n"
             " -v\t--verbose\tverbose\n"
+            " <value>\t\tint 0-100\n"
+            " \n"
+            " These options do not require an additional integer paramter:\n"
             " -m\t--mute\t\tvolume muted\n"
             " -c\t--micmute\tmicrophone muted\n"
             " -u\t--micunmute\tmicrophone unmuted\n"
-            " -b\t--brightness\tdisplay brightness\n"
             " -p\t--custom\tcustom icon\n"
-            " <value>\t\tint 0-100\n",
+            " Usage examples:\n"
+            " \t$ volnoti-show -m\n"
+            " \t$ volnoti-show -c 20\n"
+            " \t$ volnoti-show -p /home/chad/svgs/play.svg 20\n"
+            " Note that -p must be followed by a path and then the corresponding integer value.\n"
+            " \n"
+            " These options require the integer value:\n"
+            " -b\t--brightness\tdisplay brightness\n"
+            " Usage examples:\n"
+            " \t$ volnoti-show -b 76\n",
             filename);
 
     if (failure)
@@ -73,7 +84,7 @@ int main(int argc, const char *argv[])
     if (help)
         print_usage(argv[0], FALSE);
 
-    gint volume;
+    gint value = 0;
     char *custom_icon_path = NULL;
 
     if (muted)
@@ -83,21 +94,30 @@ int main(int argc, const char *argv[])
 
         else if (argc == 2)
         {
-            if (sscanf(argv[1], "%d", &volume) != 1)
+            if (sscanf(argv[1], "%d", &value) != 1)
                 print_usage(argv[0], TRUE);
 
-            if (volume > 100 || volume < 0)
+            if (value > 100 || value < 0)
                 print_usage(argv[0], TRUE);
         }
         else
-            volume = 0;
+            value = 0;
     }
     else if (custom)
     {
-        if (argc != 2)
+        if (argc != 2 && argc != 3)
             print_usage(argv[0], TRUE);
 
         custom_icon_path = argv[1];
+        if (argc == 3)
+        {
+            if (sscanf(argv[2], "%d", &value) != 1)
+                print_usage(argv[0], TRUE);
+
+            if (value > 100 || value < 0)
+                print_usage(argv[0], TRUE);
+        }
+
         print_debug(argv[1], debug);
     }
     else
@@ -105,10 +125,10 @@ int main(int argc, const char *argv[])
         if (argc != 2)
             print_usage(argv[0], TRUE);
 
-        if (sscanf(argv[1], "%d", &volume) != 1)
+        if (sscanf(argv[1], "%d", &value) != 1)
             print_usage(argv[0], TRUE);
 
-        if (volume > 100 || volume < 0)
+        if (value > 100 || value < 0)
             print_usage(argv[0], TRUE);
     }
 
@@ -144,8 +164,8 @@ int main(int argc, const char *argv[])
 
     print_debug_ok(debug);
 
-    print_debug("Sending volume...", debug);
-    uk_ac_cam_db538_VolumeNotification_notify(proxy, volume, muted, brightness, custom, custom_icon_path, &error);
+    print_debug("Sending value...", debug);
+    uk_ac_cam_db538_VolumeNotification_notify(proxy, value, muted, brightness, custom, custom_icon_path, &error);
 
     if (error != NULL)
     {
