@@ -36,7 +36,9 @@ static void print_usage(const char *filename, int failure)
             " -c\t--micmute\tmicrophone muted\n"
             " -u\t--micunmute\tmicrophone unmuted\n"
             " -b\t--brightness\tdisplay brightness\n"
-            " <value>\t\tint 0-100\n", filename);
+            " -p\t--custom\tcustom icon\n"
+            " <value>\t\tint 0-100\n",
+            filename);
 
     if (failure)
         exit(EXIT_FAILURE);
@@ -46,17 +48,25 @@ static void print_usage(const char *filename, int failure)
 
 int main(int argc, const char *argv[])
 {
-    void *options = gopt_sort(&argc, argv, gopt_start(
-                                  gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")),
-                                  gopt_option('m', 0, gopt_shorts('m'), gopt_longs("mute")),
-                                  gopt_option('c', 0, gopt_shorts('c'), gopt_longs("micmute")),
-                                  gopt_option('u', 0, gopt_shorts('u'), gopt_longs("micunmute")),
-                                  gopt_option('b', 0, gopt_shorts('b'), gopt_longs("brightness")),
-                                  gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
+    void *options = gopt_sort(
+        &argc,
+        argv,
+        gopt_start(
+            gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")),
+            gopt_option('m', 0, gopt_shorts('m'), gopt_longs("mute")),
+            gopt_option('c', 0, gopt_shorts('c'), gopt_longs("micmute")),
+            gopt_option('u', 0, gopt_shorts('u'), gopt_longs("micunmute")),
+            gopt_option('b', 0, gopt_shorts('b'), gopt_longs("brightness")),
+            gopt_option('p', 0, gopt_shorts('p'), gopt_longs("custom")),
+            gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
+
     int help = gopt(options, 'h');
     int debug = gopt(options, 'v');
-    int muted = gopt(options, 'm') ? 1 : gopt(options, 'c') ? 2 : gopt(options, 'u') ? 3 : 0;
+    int muted = gopt(options, 'm') ? 1 : gopt(options, 'c') ? 2
+                                     : gopt(options, 'u')   ? 3
+                                                            : 0;
     int brightness = gopt(options, 'b');
+    int custom = gopt(options, 'p');
 
     gopt_free(options);
 
@@ -64,8 +74,9 @@ int main(int argc, const char *argv[])
         print_usage(argv[0], FALSE);
 
     gint volume;
+    char *custom_icon_path = NULL;
 
-    if (muted )
+    if (muted)
     {
         if (argc > 2)
             print_usage(argv[0], TRUE);
@@ -80,6 +91,14 @@ int main(int argc, const char *argv[])
         }
         else
             volume = 0;
+    }
+    else if (custom)
+    {
+        if (argc != 2)
+            print_usage(argv[0], TRUE);
+
+        custom_icon_path = argv[1];
+        print_debug(argv[1], debug);
     }
     else
     {
@@ -126,9 +145,9 @@ int main(int argc, const char *argv[])
     print_debug_ok(debug);
 
     print_debug("Sending volume...", debug);
-    uk_ac_cam_db538_VolumeNotification_notify(proxy, volume, muted, brightness, &error);
+    uk_ac_cam_db538_VolumeNotification_notify(proxy, volume, muted, brightness, custom, custom_icon_path, &error);
 
-    if (error !=  NULL)
+    if (error != NULL)
     {
         handle_error("Failed to send notification", error->message, FALSE);
         g_clear_error(&error);

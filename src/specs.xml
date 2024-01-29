@@ -5,6 +5,8 @@
       <arg type="i" name="volume" direction="in"/>
       <arg type="i" name="muted" direction="in"/>
       <arg type="b" name="brightness" direction="in"/>
+      <arg type="b" name="custom" direction="in"/>
+      <arg type="s" name="custom_icon_path" direction="in"/>
     </method>
   </interface>
 </node>
