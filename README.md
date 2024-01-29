@@ -1,6 +1,8 @@
 Volnoti
 =========
 
+IMPORTANT: branch custom_icon has not been tested. Check the readme in the branch for more details.
+
 Volnoti is a lightweight volume notification daemon for GNU/Linux and
 other POSIX operating systems. It is based on GTK+ and D-Bus and should
 work with any sensible window manager. The original aim was to create
