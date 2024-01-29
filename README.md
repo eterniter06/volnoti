@@ -1,7 +1,7 @@
 Volnoti
 =========
 
-IMPORTANT: This branch is untested. It has not been checked what happens on passing invalid paths when displaying custom_icons, let alone handle an error. Proceed only if you understand the consequences. The affected section can be found in daemon.c in the most recent commit.
+IMPORTANT: This branch is untested. It has not been checked what happens on passing invalid paths when displaying custom_icons, let alone handle an error. Proceed only if you understand the consequences. The affected section can be found in daemon.c in the the commit: https://github.com/eterniter06/volnoti/commit/3b2a9ed9f8d9361efa7921e7d7d3e5ccabebfb79.
 
 Volnoti is a lightweight volume notification daemon for GNU/Linux and
 other POSIX operating systems. It is based on GTK+ and D-Bus and should
@@ -138,6 +138,14 @@ To show a notification for un-muted microphone, run:
 To show a notification for brightness level 50%, run:
 
     $ volnoti-show -b 50
+
+To show a notification for a custom activity, you can pass the absolute path to the icon with:
+
+    $ volnoti-show -p /home/chad/svgs/gaming.svg
+
+This option can also take an integer for the progressbar value. (Default value for the progressbar is 0):
+
+    $ volnoti-show -p /home/chad/svgs/play.svg 73
 
 The best way to do this is to create simple script and attach it to 
 the hot-keys on your keyboard. But this depends on your window manager
