@@ -11,44 +11,7 @@ is heavily based on the GNOME notification-daemon.
 
 Distribution packages
 ---------------------
-Arch Linux - Modified PKGBUILD based on the package in the [AUR](https://aur.archlinux.org/packages.php?ID=55159):
-```
-# Original authors:
-# Maintainer: willemw <willemw12@gmail.com>
-# Contibutor: David Brazdil <db538@cam.ac.uk>
-
-# Modified by
-# Himanshu <himanshuhimsurya@gmail.com>
-# Difference: Uses a fork of the repo incorporating some pull requests lying on the original repo
-# Features pulled: Brightness, Mic mute/unmute and single decimal timeout support, e.g. 1.3
-
-pkgname=volnoti
-pkgver=0.1
-pkgrel=1
-pkgdesc='Lightweight volume notification'
-url=https://github.com/eterniter06/volnoti
-arch=(x86_64)
-license=(GPL3)
-depends=(dbus-glib gdk-pixbuf2 gtk2 librsvg)
-makedepends=(git python3)
-source=("$pkgname::git+$url.git#branch=master")
-sha256sums=('SKIP')
-
-build() {
-  cd $pkgname
-
-  #./prepare.sh
-  autoreconf --force --install
-  autoupdate --force
-
-  ./configure --prefix=/usr
-  make
-}
-
-package() {
-  make -C $pkgname DESTDIR="$pkgdir" install
-}
-```
+- Arch Linux
 
 Dependencies
 ------------

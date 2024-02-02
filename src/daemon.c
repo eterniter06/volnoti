@@ -185,10 +185,11 @@ gboolean volume_object_notify(VolumeObject *obj,
     // choose icon
     if (custom)
     {
-        GdkPixbuf *custom_icon = gdk_pixbuf_new_from_file(custom_icon_path, error);
+        GError* local_error = NULL;
+        GdkPixbuf *custom_icon = gdk_pixbuf_new_from_file(custom_icon_path, &local_error);
 
-    if (error != NULL)
-        handle_error("Couldn't load custom icon.", (*error)->message, TRUE);
+    if (local_error != NULL)
+        handle_error("Couldn't load custom icon.", local_error->message, TRUE);
 
 
         set_notification_icon(GTK_WINDOW(obj->notification), custom_icon);
