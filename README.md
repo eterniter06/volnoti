@@ -1,8 +1,6 @@
 Volnoti
 =========
 
-IMPORTANT: branch custom_icon has not been tested. Check the readme in the branch for more details.
-
 Volnoti is a lightweight volume notification daemon for GNU/Linux and
 other POSIX operating systems. It is based on GTK+ and D-Bus and should
 work with any sensible window manager. The original aim was to create
@@ -138,6 +136,14 @@ To show a notification for un-muted microphone, run:
 To show a notification for brightness level 50%, run:
 
     $ volnoti-show -b 50
+
+To show a notification for a custom activity, you can pass the absolute path to the icon with:
+
+    $ volnoti-show -p /home/chad/svgs/gaming.svg
+
+This option can also take an integer for the progressbar value. (Default value for the progressbar is 0):
+
+    $ volnoti-show -p /home/chad/svgs/play.svg 73
 
 The best way to do this is to create simple script and attach it to 
 the hot-keys on your keyboard. But this depends on your window manager

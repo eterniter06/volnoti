@@ -25,7 +25,7 @@
 #include "gopt.h"
 #include "notification.h"
 
-#define IMAGE_PATH   PREFIX
+#define IMAGE_PATH PREFIX
 
 typedef struct
 {
@@ -36,6 +36,7 @@ typedef struct
     gboolean micmuted;
     gboolean micunmuted;
     gboolean brightness;
+    gboolean custom;
 
     GtkWindow *notification;
 
@@ -70,25 +71,32 @@ gboolean volume_object_notify(VolumeObject *obj,
                               gint value_in,
                               gboolean muted,
                               gboolean brightness,
+                              gboolean custom,
+                              gchar *custom_icon_path,
                               GError **error);
 
 #define VOLUME_TYPE_OBJECT \
-        (volume_object_get_type())
-#define VOLUME_OBJECT(object) \
-        (G_TYPE_CHECK_INSTANCE_CAST ((object), \
-         VOLUME_TYPE_OBJECT, VolumeObject))
-#define VOLUME_OBJECT_CLASS(klass) \
-        (G_TYPE_CHECK_CLASS_CAST ((klass), \
-         VOLUME_TYPE_OBJECT, VolumeObjectClass))
-#define VOLUME_IS_OBJECT(object) \
-        (G_TYPE_CHECK_INSTANCE_TYPE ((object), \
-         VOLUME_TYPE_OBJECT))
+    (volume_object_get_type())
+
+#define VOLUME_OBJECT(object)             \
+    (G_TYPE_CHECK_INSTANCE_CAST((object), \
+                                VOLUME_TYPE_OBJECT, VolumeObject))
+
+#define VOLUME_OBJECT_CLASS(klass)    \
+    (G_TYPE_CHECK_CLASS_CAST((klass), \
+                             VOLUME_TYPE_OBJECT, VolumeObjectClass))
+
+#define VOLUME_IS_OBJECT(object)          \
+    (G_TYPE_CHECK_INSTANCE_TYPE((object), \
+                                VOLUME_TYPE_OBJECT))
+
 #define VOLUME_IS_OBJECT_CLASS(klass) \
-        (G_TYPE_CHECK_CLASS_TYPE ((klass), \
-         VOLUME_TYPE_OBJECT))
-#define VOLUME_OBJECT_GET_CLASS(obj) \
-        (G_TYPE_INSTANCE_GET_CLASS ((obj), \
-         VOLUME_TYPE_OBJECT, VolumeObjectClass))
+    (G_TYPE_CHECK_CLASS_TYPE((klass), \
+                             VOLUME_TYPE_OBJECT))
+
+#define VOLUME_OBJECT_GET_CLASS(obj)  \
+    (G_TYPE_INSTANCE_GET_CLASS((obj), \
+                               VOLUME_TYPE_OBJECT, VolumeObjectClass))
 
 G_DEFINE_TYPE(VolumeObject, volume_object, G_TYPE_OBJECT)
 
@@ -131,6 +139,8 @@ gboolean volume_object_notify(VolumeObject *obj,
                               gint value,
                               gboolean muted,
                               gboolean brightness,
+                              gboolean custom,
+                              gchar *custom_icon_path,
                               GError **error)
 {
     g_assert(obj != NULL);
@@ -141,13 +151,13 @@ gboolean volume_object_notify(VolumeObject *obj,
         obj->micmuted = FALSE;
         obj->micunmuted = FALSE;
     }
-    else if ( muted == MIC_MUTED )
+    else if (muted == MIC_MUTED)
     {
         obj->muted = FALSE;
         obj->micunmuted = FALSE;
         obj->micmuted = TRUE;
     }
-    else if ( muted == MIC_UNMUTED )
+    else if (muted == MIC_UNMUTED)
     {
         obj->muted = FALSE;
         obj->micunmuted = TRUE;
@@ -168,12 +178,22 @@ gboolean volume_object_notify(VolumeObject *obj,
         print_debug("Creating new notification...", obj->debug);
         obj->notification = create_notification(obj->settings);
         gtk_widget_realize(GTK_WIDGET(obj->notification));
-        g_timeout_add(100, (GSourceFunc) time_handler, (gpointer) obj);
+        g_timeout_add(100, (GSourceFunc)time_handler, (gpointer)obj);
         print_debug_ok(obj->debug);
     }
 
     // choose icon
-    if (obj->brightness)
+    if (custom)
+    {
+        GdkPixbuf *custom_icon = gdk_pixbuf_new_from_file(custom_icon_path, error);
+
+    if (error != NULL)
+        handle_error("Couldn't load custom icon.", (*error)->message, TRUE);
+
+
+        set_notification_icon(GTK_WINDOW(obj->notification), custom_icon);
+    }
+    else if (obj->brightness)
         set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_brightness);
     else if (obj->muted)
         set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_muted);
@@ -215,8 +235,8 @@ static void print_usage(const char *filename, int failure)
             "Configuration:\n"
             " -t <float>\t--timeout <float>\tnotification timeout in seconds with one optional decimal place\n"
             " -a <float>\t--alpha <float>\t\ttransparency level (0.0 - 1.0, default %.2f)\n"
-            " -r <int>\t--corner-radius <int>\tradius of the round corners in pixels (default %d)\n"
-            , filename, settings.alpha, settings.corner_radius);
+            " -r <int>\t--corner-radius <int>\tradius of the round corners in pixels (default %d)\n",
+            filename, settings.alpha, settings.corner_radius);
 
     if (failure)
         exit(EXIT_FAILURE);
@@ -227,26 +247,20 @@ static void print_usage(const char *filename, int failure)
 int main(int argc, char *argv[])
 {
     Settings settings = get_default_settings();
-    int timeout = 30;       // in ms
+    int timeout = 30; // in ms
 
-    void *options = gopt_sort(&argc, (const char **) argv, gopt_start(
-                                  gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")),
-                                  gopt_option('n', 0, gopt_shorts('n'), gopt_longs("no-daemon")),
-                                  gopt_option('t', GOPT_ARG, gopt_shorts('t'), gopt_longs("timeout")),
-                                  gopt_option('a', GOPT_ARG, gopt_shorts('a'), gopt_longs("alpha")),
-                                  gopt_option('r', GOPT_ARG, gopt_shorts('r'), gopt_longs("corner-radius")),
-                                  gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
+    void *options = gopt_sort(&argc, (const char **)argv, gopt_start(gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")), gopt_option('n', 0, gopt_shorts('n'), gopt_longs("no-daemon")), gopt_option('t', GOPT_ARG, gopt_shorts('t'), gopt_longs("timeout")), gopt_option('a', GOPT_ARG, gopt_shorts('a'), gopt_longs("alpha")), gopt_option('r', GOPT_ARG, gopt_shorts('r'), gopt_longs("corner-radius")), gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
 
     int help = gopt(options, 'h');
     int debug = gopt(options, 'v');
     int no_daemon = gopt(options, 'n');
 
-    float timeout_in;   // cmd argument. Unused if unsupplied. Uninitialization is safe (for now)
+    float timeout_in; // cmd argument. Unused if unsupplied. Uninitialization is safe (for now)
 
     if (gopt(options, 't'))
     {
         if (sscanf(gopt_arg_i(options, 't', 0), "%f", &timeout_in) == 1 && timeout_in > 0.0f)
-            timeout = (int) (timeout_in * 10);
+            timeout = (int)(timeout_in * 10);
         else
             print_usage(argv[0], TRUE);
     }
@@ -403,18 +417,18 @@ int main(int argc, char *argv[])
 
     // check that the images are of the same size
     if (gdk_pixbuf_get_width(status->image_progressbar_empty) != gdk_pixbuf_get_width(status->image_progressbar_full) ||
-            gdk_pixbuf_get_height(status->image_progressbar_empty) != gdk_pixbuf_get_height(status->image_progressbar_full) ||
-            gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty) != gdk_pixbuf_get_bits_per_sample(status->image_progressbar_full))
+        gdk_pixbuf_get_height(status->image_progressbar_empty) != gdk_pixbuf_get_height(status->image_progressbar_full) ||
+        gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty) != gdk_pixbuf_get_bits_per_sample(status->image_progressbar_full))
         handle_error("Progress bar images aren't of the same size or don't have the same number of bits per sample.", "Unknown(OOM?)", TRUE);
 
     // create pixbuf for combined image
     status->width_progressbar = gdk_pixbuf_get_width(status->image_progressbar_empty);
     status->height_progressbar = gdk_pixbuf_get_height(status->image_progressbar_empty);
     status->image_progressbar = gdk_pixbuf_new(GDK_COLORSPACE_RGB,
-                                TRUE,
-                                gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty),
-                                status->width_progressbar,
-                                status->height_progressbar);
+                                               TRUE,
+                                               gdk_pixbuf_get_bits_per_sample(status->image_progressbar_empty),
+                                               status->width_progressbar,
+                                               status->height_progressbar);
 
     print_debug_ok(debug);
 

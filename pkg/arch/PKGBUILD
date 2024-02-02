@@ -4,12 +4,10 @@
 
 # Modified by
 # Himanshu <himanshuhimsurya@gmail.com>
-# Difference: Uses a fork of the repo incorporating some pull requests lying on the original repo
-# Features pulled: Brightness, Mic mute/unmute and single decimal timeout support e.g. 1.3
 
 pkgname=volnoti
-pkgver=0.1
-pkgrel=1
+pkgver=0.3
+pkgrel=3
 pkgdesc='Lightweight volume notification'
 url=https://github.com/eterniter06/volnoti
 arch=(x86_64)
