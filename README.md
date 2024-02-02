@@ -1,5 +1,4 @@
-Volnoti
-=========
+# Volnoti
 
 Volnoti is a lightweight volume notification daemon for GNU/Linux and
 other POSIX operating systems. It is based on GTK+ and D-Bus and should
@@ -9,13 +8,23 @@ or XMonad. It is known to work with a wide range of WMs, including
 GNOME, KDE, Xfce, LXDE, XMonad, i3 and many others. The source code
 is heavily based on the GNOME notification-daemon.
 
-Distribution packages
----------------------
+## Why another fork?
+The original repo https://github.com/davidbrazdil/volnoti has had no signs of activity since the last decade. This fork incorporates some of the pull requests from the original repo that seemed to be useful:
+- [Option for brightness](https://github.com/davidbrazdil/volnoti/pull/14)
+- [Option for mic mute and unmute](https://github.com/davidbrazdil/volnoti/pull/18)
+- [Generating value-*-stub.h ??](https://github.com/davidbrazdil/volnoti/pull/7)
+- [Allow one decimal place to daemon's --timeout argument](https://github.com/davidbrazdil/volnoti/pull/5)
+
+along with some other feature(s) that I wanted:
+- [Option for showing any icon after the daemon is started](#custom-activity-icons-at-runtime)
+
+Other changes to the project include help message changes, change in an error message, a changed brightness icon and an updated PKGBUILD file for arch linux (not in AUR).
+
+
+## Distribution packages
 - Arch Linux
 
-Dependencies
-------------
-
+## Dependencies
 You need the following libraries to compile Volnoti yourself. Please 
 install them through the package manager of your distribution, or follow
 installation instructions on the projects' websites.
@@ -29,9 +38,7 @@ You can compile it with standard `GCC`, with `make` and `pkg-config`
 installed, and you will need `autoconf` and `automake` if you choose 
 to compile the Git version.
 
-Compilation from Git
---------------------
-
+## Compilation from Git
 Start by downloading the source code from GitHub:
 
     $ git clone git://github.com/davidbrazdil/volnoti.git
@@ -52,9 +59,7 @@ a provided script:
 
     $ ./package.sh
 
-Compilation from source archive
--------------------------------
-
+## Compilation from source archive
 Download the `.tar.gz` source archive from the GitHub page, and then
 extract its contents by calling:
 
@@ -66,9 +71,7 @@ Then just follow the basic GNU routine:
     $ make
     $ sudo make install
 
-Running the application
------------------------
-
+## Running the application
 Firstly, you need to running the daemon (add it to your startup 
 applications):
 
@@ -100,6 +103,7 @@ To show a notification for brightness level 50%, run:
 
     $ volnoti-show -b 50
 
+### Custom activity icons at runtime
 To show a notification for a custom activity, you can pass the absolute path to the icon with:
 
     $ volnoti-show -p /home/chad/svgs/gaming.svg
@@ -112,8 +116,7 @@ The best way to do this is to create simple script and attach it to
 the hot-keys on your keyboard. But this depends on your window manager
 and system configuration.
 
-Theming
--------
+## Theming
 
 Some parameters of the notifications can be changed through the 
 parameters of the daemon. To learn more, run:
@@ -124,9 +127,8 @@ All the images are stored in `/usr/share/pixmaps/volnoti` (depending
 on the chosen prefix during configuration phase) and it should be
 easy to replace them with your favourite icons.
 
-Credits
--------
- - Brightness Icon (https://www.svgrepo.com/svg/479348/brightness)
+## Credits
+ - Brightness Icon (updated) (https://www.svgrepo.com/svg/479348/brightness)
  - Faenza Icon Set (tiheum.deviantart.com)
  - Notification-daemon (www.gnome.org)
  - Gopt (www.purposeful.co.uk/software/gopt)
