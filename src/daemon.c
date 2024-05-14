@@ -171,7 +171,7 @@ gboolean volume_object_notify(VolumeObject *obj,
     }
 
     obj->brightness = brightness ? TRUE : FALSE;
-    obj->volume = (value > 100) ? 100 : value;
+    obj->volume = value;
 
     if (obj->notification == NULL)
     {
@@ -182,15 +182,16 @@ gboolean volume_object_notify(VolumeObject *obj,
         print_debug_ok(obj->debug);
     }
 
+    gboolean show_progressbar = TRUE;
+
     // choose icon
     if (custom)
     {
         GError* local_error = NULL;
         GdkPixbuf *custom_icon = gdk_pixbuf_new_from_file(custom_icon_path, &local_error);
 
-    if (local_error != NULL)
-        handle_error("Couldn't load custom icon.", local_error->message, TRUE);
-
+        if (local_error != NULL)
+            handle_error("Couldn't load custom icon.", local_error->message, TRUE);
 
         set_notification_icon(GTK_WINDOW(obj->notification), custom_icon);
     }
@@ -211,13 +212,21 @@ gboolean volume_object_notify(VolumeObject *obj,
     else
         set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_off);
 
+    if(obj->volume < 0 || obj->volume > 100)
+        show_progressbar = FALSE;
+
     // prepare and set progress bar
-    gint width_full = obj->width_progressbar * obj->volume / 100;
-    gdk_pixbuf_copy_area(obj->image_progressbar_full, 0, 0, width_full, obj->height_progressbar,
-                         obj->image_progressbar, 0, 0);
-    gdk_pixbuf_copy_area(obj->image_progressbar_empty, width_full, 0, obj->width_progressbar - width_full, obj->height_progressbar,
-                         obj->image_progressbar, width_full, 0);
-    set_progressbar_image(GTK_WINDOW(obj->notification), obj->image_progressbar);
+    if(show_progressbar){
+        gint width_full = obj->width_progressbar * obj->volume / 100;
+        gdk_pixbuf_copy_area(obj->image_progressbar_full, 0, 0, width_full, obj->height_progressbar,
+                             obj->image_progressbar, 0, 0);
+        gdk_pixbuf_copy_area(obj->image_progressbar_empty, width_full, 0, obj->width_progressbar - width_full, obj->height_progressbar,
+                             obj->image_progressbar, width_full, 0);
+        set_progressbar_image(GTK_WINDOW(obj->notification), obj->image_progressbar);
+    }
+    else{
+        set_progressbar_image(GTK_WINDOW(obj->notification), NULL);
+    }
 
     obj->time_left = obj->timeout;
     gtk_widget_show_all(GTK_WIDGET(obj->notification));

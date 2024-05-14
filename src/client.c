@@ -27,14 +27,16 @@
 
 #include "value-client-stub.h"
 
+#define MAX_PROGRESSBAR_VALUE 101
+
 static void print_usage(const char *filename, int failure)
 {
     g_print("Usage: %s [-v] [-m] <value>\n"
             " -h\t--help\t\thelp\n"
             " -v\t--verbose\tverbose\n"
-            " <value>\t\tint 0-100\n"
+            " <value>\t\tint 0-%d (%d will not show a progressbar)\n"
             " \n"
-            " These options do not require an additional integer paramter:\n"
+            " These options may be followed by an integer for the progressbar:\n"
             " -m\t--mute\t\tvolume muted\n"
             " -c\t--micmute\tmicrophone muted\n"
             " -u\t--micunmute\tmicrophone unmuted\n"
@@ -45,11 +47,11 @@ static void print_usage(const char *filename, int failure)
             " \t$ volnoti-show -p /home/chad/svgs/play.svg 20\n"
             " Note that -p must be followed by a path and then the corresponding integer value.\n"
             " \n"
-            " These options require the integer value:\n"
+            " These options must be followed by a integer for the progressbar:\n"
             " -b\t--brightness\tdisplay brightness\n"
             " Usage examples:\n"
             " \t$ volnoti-show -b 76\n",
-            filename);
+            filename, MAX_PROGRESSBAR_VALUE, MAX_PROGRESSBAR_VALUE);
 
     if (failure)
         exit(EXIT_FAILURE);
@@ -97,7 +99,7 @@ int main(int argc, const char *argv[])
             if (sscanf(argv[1], "%d", &value) != 1)
                 print_usage(argv[0], TRUE);
 
-            if (value > 100 || value < 0)
+            if (value > MAX_PROGRESSBAR_VALUE || value < 0)
                 print_usage(argv[0], TRUE);
         }
         else
@@ -114,7 +116,7 @@ int main(int argc, const char *argv[])
             if (sscanf(argv[2], "%d", &value) != 1)
                 print_usage(argv[0], TRUE);
 
-            if (value > 100 || value < 0)
+            if (value > MAX_PROGRESSBAR_VALUE || value < 0)
                 print_usage(argv[0], TRUE);
         }
 
@@ -128,7 +130,7 @@ int main(int argc, const char *argv[])
         if (sscanf(argv[1], "%d", &value) != 1)
             print_usage(argv[0], TRUE);
 
-        if (value > 100 || value < 0)
+        if (value > MAX_PROGRESSBAR_VALUE || value < 0)
             print_usage(argv[0], TRUE);
     }
 

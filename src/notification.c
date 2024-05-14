@@ -590,7 +590,8 @@ set_notification_icon (GtkWindow *nw, GdkPixbuf *pixbuf)
 
         gtk_widget_show (windata->icon);
         gtk_widget_set_size_request (windata->iconbox,
-                                     MAX (BODY_X_OFFSET, pixbuf_width), -1);
+                                     MAX (BODY_X_OFFSET, pixbuf_width),
+                                     -1);
         g_object_unref (scaled);
     }
     else
@@ -605,16 +606,12 @@ set_notification_icon (GtkWindow *nw, GdkPixbuf *pixbuf)
 void
 set_progressbar_image (GtkWindow *nw, GdkPixbuf *pixbuf)
 {
-    WindowData *windata;
-    GdkPixbuf  *scaled;
-
-    windata = g_object_get_data (G_OBJECT (nw), "windata");
-
+    WindowData *windata = g_object_get_data (G_OBJECT (nw), "windata");
     g_assert (windata != NULL);
 
-    scaled = NULL;
+    GdkPixbuf *scaled = NULL;
 
-    if (pixbuf != NULL)
+    if (pixbuf)
     {
         scaled = scale_pixbuf (pixbuf,
                                MAX_PROGRESSBAR_SIZE,
@@ -624,7 +621,7 @@ set_progressbar_image (GtkWindow *nw, GdkPixbuf *pixbuf)
 
     gtk_image_set_from_pixbuf (GTK_IMAGE (windata->progressbar), scaled);
 
-    if (scaled != NULL)
+    if (scaled)
     {
         int pixbuf_width = gdk_pixbuf_get_width (scaled);
 
@@ -637,7 +634,7 @@ set_progressbar_image (GtkWindow *nw, GdkPixbuf *pixbuf)
     {
         gtk_widget_hide (windata->icon);
         gtk_widget_set_size_request (windata->progressbarbox,
-                                     BODY_X_OFFSET,
+                                     MAX_PROGRESSBAR_SIZE,
                                      -1);
     }
 }

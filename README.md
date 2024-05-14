@@ -17,6 +17,7 @@ The original repo https://github.com/davidbrazdil/volnoti has had no signs of ac
 
 along with some other feature(s) that I wanted:
 - [Option for showing any icon after the daemon is started](#custom-activity-icons-at-runtime)
+- [Hide the progressbar for an icon](#no-progressbar)
 
 Other changes to the project include help message changes, change in an error message, a changed brightness icon and an updated PKGBUILD file for arch linux (not in AUR).
 
@@ -112,7 +113,12 @@ This option can also take an integer for the progressbar value. (Default value f
 
     $ volnoti-show -p /home/chad/svgs/play.svg 73
 
-The best way to do this is to create simple script and attach it to 
+### No Progressbar
+For icons that do not need a progressbar, simply pass 101 as the progressbar value:
+    
+    $ volnoti-show -p /home/chad/svgs/previous.svg 101
+
+The best way to use volnoti is to create a simple script and attach it to 
 the hot-keys on your keyboard. But this depends on your window manager
 and system configuration.
 
