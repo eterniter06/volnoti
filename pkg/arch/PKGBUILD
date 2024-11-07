@@ -7,12 +7,12 @@
 
 pkgname=volnoti
 pkgver=0.4
-pkgrel=18
+pkgrel=19
 pkgdesc='Lightweight volume notification'
 url=https://github.com/eterniter06/volnoti
 arch=(x86_64)
 license=(GPL3)
-depends=(dbus-glib gdk-pixbuf2 gtk2 librsvg)
+depends=(dbus-glib gdk-pixbuf2 gtk2 glib2-devel librsvg)
 makedepends=(git python3)
 source=("$pkgname::git+$url.git#branch=master")
 sha256sums=('SKIP')
