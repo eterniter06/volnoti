@@ -8,7 +8,7 @@
    fill="none"
    version="1.1"
    id="svg2"
-   sodipodi:docname="mic-svgrepo-com.svg"
+   sodipodi:docname="pause-svgrepo-com.svg"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -26,7 +26,7 @@
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#505050"
      inkscape:zoom="0.9925"
-     inkscape:cx="399.49622"
+     inkscape:cx="400.50378"
      inkscape:cy="400"
      inkscape:window-width="1920"
      inkscape:window-height="1023"
@@ -35,15 +35,17 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
   <path
-     d="m 8,5 c 0,-2.20914 1.79086,-4 4,-4 2.2091,0 4,1.79086 4,4 v 7 c 0,2.2091 -1.7909,4 -4,4 -2.20914,0 -4,-1.7909 -4,-4 z"
-     fill="#000000"
+     d="M2 18C2 19.8856 2 20.8284 2.58579 21.4142C3.17157 22 4.11438 22 6 22C7.88562 22 8.82843 22 9.41421 21.4142C10 20.8284 10 19.8856 10 18V6C10 4.11438 10 3.17157 9.41421 2.58579C8.82843 2 7.88562 2 6 2C4.11438 2 3.17157 2 2.58579 2.58579C2 3.17157 2 4.11438 2 6V14"
+     stroke="#1C274C"
+     stroke-width="1.5"
+     stroke-linecap="round"
      id="path1"
-     sodipodi:nodetypes="sssssss"
-     style="fill:#e5e5e5;fill-opacity:1" />
+     style="stroke:#e5e5e5;stroke-opacity:1" />
   <path
-     d="M 6.25,11.8438 V 12 c 0,1.525 0.6058,2.9875 1.68414,4.0659 C 9.01247,17.1442 10.475,17.75 12,17.75 c 1.525,0 2.9875,-0.6058 4.0659,-1.6841 C 17.1442,14.9875 17.75,13.525 17.75,12 v -0.1562 c 0,-0.5523 0.4477,-1 1,-1 h 0.5 c 0.5523,0 1,0.4477 1,0.9999 V 12 c 0,2.188 -0.8692,4.2865 -2.4164,5.8336 -1.2494,1.2495 -2.8583,2.0567 -4.5836,2.3212 V 22 c 0,0.5523 -0.4477,1 -1,1 h -0.5 c -0.5523,0 -1,-0.4477 -1,-1 V 20.1548 C 9.02471,19.8903 7.41579,19.0831 6.16637,17.8336 4.61919,16.2865 3.75,14.188 3.75,12 v -0.1562 c 0,-0.5523 0.44772,-1 1,-1 h 0.5 c 0.55228,0 1,0.4477 1,1 z"
-     fill="#000000"
+     d="M22 6C22 4.11438 22 3.17157 21.4142 2.58579C20.8284 2 19.8856 2 18 2C16.1144 2 15.1716 2 14.5858 2.58579C14 3.17157 14 4.11438 14 6V18C14 19.8856 14 20.8284 14.5858 21.4142C15.1716 22 16.1144 22 18 22C19.8856 22 20.8284 22 21.4142 21.4142C22 20.8284 22 19.8856 22 18V10"
+     stroke="#1C274C"
+     stroke-width="1.5"
+     stroke-linecap="round"
      id="path2"
-     sodipodi:nodetypes="sscscssssssccssssccsssss"
-     style="fill:#e5e5e5;fill-opacity:1" />
+     style="stroke:#e5e5e5;stroke-opacity:1" />
 </svg>

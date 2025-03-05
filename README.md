@@ -19,7 +19,7 @@ along with some other feature(s) that I wanted:
 - [Option for showing any icon after the daemon is started](#custom-activity-icons-at-runtime)
 - [Hide the progressbar for an icon](#no-progressbar)
 
-Other changes to the project include help message changes, change in an error message, a changed brightness icon and an updated PKGBUILD file for arch linux (not in AUR).
+Other changes to the project include help message changes, change in an error message, changed icons and an updated PKGBUILD file for arch linux (not in AUR).
 
 
 ## Distribution packages
@@ -134,7 +134,11 @@ on the chosen prefix during configuration phase) and it should be
 easy to replace them with your favourite icons.
 
 ## Credits
- - Brightness Icon (updated) (https://www.svgrepo.com/svg/479348/brightness)
- - Faenza Icon Set (tiheum.deviantart.com)
- - Notification-daemon (www.gnome.org)
- - Gopt (www.purposeful.co.uk/software/gopt)
+ - [Icooon Mono (Base for brightness icons) (updated)] (https://www.svgrepo.com/svg/479350/brightness)
+ - [Denali Design (Base for caps lock icons)] (https://www.svgrepo.com/svg/445834/keyboard-capslock)
+ - [thewolfkit (Base for mic icons)] (https://www.svgrepo.com/author/thewolfkit/)
+ - [thewolfkit (Base for Volume icons)](https://www.svgrepo.com/author/thewolfkit/), [zest (Base for volume icons)] (https://www.svgrepo.com/svg/510335/volume-high)
+ - [Solar Icons (Base for play & pause icons)] (https://www.svgrepo.com/author/thewolfkit/)
+ - [Notification-daemon] (www.gnome.org)
+ - [Gopt] (www.purposeful.co.uk/software/gopt)
+ - Self (Progressbar icons made using inkscape)

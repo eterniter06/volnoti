@@ -8,7 +8,7 @@
    id="_x32_"
    viewBox="0 0 512 512"
    xml:space="preserve"
-   sodipodi:docname="brightness-low-svgrepo-com.svg"
+   sodipodi:docname="brightness-half-svgrepo-com.svg"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -45,6 +45,11 @@
    id="path1"
    style="fill:#e5e5e5;fill-opacity:1"
    sodipodi:nodetypes="cccccccccccccccccccccccccsssss" />
-	
+	<path
+   id="path2"
+   style="fill:#e5e5e5;fill-opacity:1;stroke-width:1.12716"
+   class="st0"
+   inkscape:label="circle"
+   d="M 256 107.39625 C 173.92217 107.39625 107.3975 173.92205 107.3975 255.99875 C 107.3975 338.07545 173.92217 404.615 256 404.615 L 256 107.39625 z " />
 </g>
 </svg>

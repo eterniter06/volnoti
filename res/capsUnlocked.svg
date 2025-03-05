@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 48 48"
+   version="1.1"
+   id="svg2"
+   sodipodi:docname="keyboard-capslock-svgrepo-com.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="namedview2"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="0.68375"
+     inkscape:cx="399.26874"
+     inkscape:cy="399.26874"
+     inkscape:window-width="1920"
+     inkscape:window-height="1023"
+     inkscape:window-x="0"
+     inkscape:window-y="17"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_2" />
+  <title
+     id="title1">keyboard-capslock</title>
+  <g
+     id="Layer_2"
+     data-name="Layer 2"
+     transform="translate(0,0.26325411)">
+    <g
+       id="invisible_box"
+       data-name="invisible box">
+      <rect
+         width="48"
+         height="48"
+         fill="none"
+         id="rect1"
+         x="0"
+         y="0" />
+    </g>
+    <g
+       id="Q3_icons"
+       data-name="Q3 icons">
+      <path
+         d="M 24,6.8 39.2,22 H 33 v 6 H 15 V 22 H 8.8 L 24,6.8 M 24,2 a 2,2 0 0 0 -1.4,0.6 l -20,20 A 2,2 0 0 0 4,26 h 7 v 4 a 2,2 0 0 0 2,2 h 22 a 2,2 0 0 0 2,-2 v -4 h 7 a 2,2 0 0 0 1.4,-3.4 l -20,-20 A 2,2 0 0 0 24,2 Z"
+         id="path1"
+         style="fill:#e5e5e5;fill-opacity:1" />
+      <path
+         d="m 33,40 v 2 H 15 v -2 h 18 m 2,-4 H 13 a 2,2 0 0 0 -2,2 v 6 a 2,2 0 0 0 2,2 h 22 a 2,2 0 0 0 2,-2 v -6 a 2,2 0 0 0 -2,-2 z"
+         id="path2"
+         style="fill:#e5e5e5;fill-opacity:1" />
+    </g>
+  </g>
+</svg>
