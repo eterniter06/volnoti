@@ -8,6 +8,21 @@ or XMonad. It is known to work with a wide range of WMs, including
 GNOME, KDE, Xfce, LXDE, XMonad, i3 and many others. The source code
 is heavily based on the GNOME notification-daemon.
 
+## Screenshots
+|Previous|Play|Pause|
+|--|--|--|
+|![img](./screenshots/previous.png)|![img](./screenshots/play.png)|![img](./screenshots/pause.png)|
+
+|Next|Mic muted|Mic unmuted|
+|--|--|--|
+|![img](./screenshots/next.png)|![img](./screenshots/mic-muted.png)|![img](./screenshots/mic-unmuted.png)|
+
+|Brightness|Volume high|Volume muted, no compositer|
+|--|--|--|
+|![img](./screenshots/brightness.png)|![img](./screenshots/volume-high.png)|![img](./screenshots/volume-muted-no-compositer.png)|
+
+You can find all the icons used under the [res](./res/) folder
+
 ## Why another fork?
 The original repo https://github.com/davidbrazdil/volnoti has had no signs of activity since the last decade. This fork incorporates some of the pull requests from the original repo that seemed to be useful:
 - [Option for brightness](https://github.com/davidbrazdil/volnoti/pull/14)
