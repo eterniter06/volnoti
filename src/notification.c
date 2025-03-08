@@ -20,6 +20,7 @@
  */
 
 #include "notification.h"
+#include "common.h"
 
 #define USE_COMPOSITE
 
@@ -586,10 +587,16 @@ move_notification(GtkWindow *win, int x, int y)
     gtk_window_move(GTK_WINDOW(win), x, y);
 }
 
+
 void
-destroy_notification(GtkWindow *win)
+destroyNotification(VolumeObject *obj)
 {
-    gtk_widget_destroy(GTK_WIDGET(win));
+    if(obj->notification != NULL)
+    {
+        print_debug("Destroying notification...", obj->debug);
+        gtk_widget_destroy(GTK_WIDGET(obj->notification));
+        obj->notification = NULL;
+    }
 }
 
 void

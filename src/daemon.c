@@ -27,35 +27,7 @@
 
 #define IMAGE_PATH PREFIX
 
-typedef struct
-{
-    GObject parent;
-
-    gint value;
-    gint valueType;
-
-    GtkWindow *notification;
-
-    GdkPixbuf *icon_high;
-    GdkPixbuf *icon_medium;
-    GdkPixbuf *icon_low;
-    GdkPixbuf *icon_off;
-    GdkPixbuf *icon_muted;
-    GdkPixbuf *icon_micon;
-    GdkPixbuf *icon_micmuted;
-    GdkPixbuf *icon_brightness;
-
-    GdkPixbuf *image_progressbar_empty;
-    GdkPixbuf *image_progressbar_full;
-    GdkPixbuf *image_progressbar;
-    gint width_progressbar;
-    gint height_progressbar;
-
-    gint time_left;
-    gint timeout;
-    gboolean debug;
-    Settings settings;
-} VolumeObject;
+static VolumeObject *lastNotification = NULL;
 
 typedef struct
 {
@@ -123,9 +95,7 @@ time_handler(VolumeObject *obj)
 
     if(obj->time_left <= 0)
     {
-        print_debug("Destroying notification...", obj->debug);
-        destroy_notification(obj->notification);
-        obj->notification = NULL;
+        destroyNotification(obj);
         print_debug_ok(obj->debug);
         return FALSE;
     }
@@ -180,6 +150,14 @@ gboolean volume_object_notify(VolumeObject *obj,
     GError **error)
 {
     g_assert(obj != NULL);
+
+    if(lastNotification != NULL)
+    {
+        if(lastNotification->notification != NULL)
+            destroyNotification(lastNotification);
+    }
+
+    lastNotification = obj;
 
     gboolean myuted = valueType == VOL_MUTED;
     gboolean micmuted = valueType == MIC_MUTED;
