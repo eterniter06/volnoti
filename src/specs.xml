@@ -7,6 +7,9 @@
       <arg type="b" name="brightness" direction="in"/>
       <arg type="b" name="custom" direction="in"/>
       <arg type="s" name="custom_icon_path" direction="in"/>
+      <arg type="s" name="custom_label_text" direction="in"/>
+      <arg type="s" name="custom_label_font_and_size" direction="in"/>
+      <arg type="s" name="custom_label_font_color" direction="in"/>
     </method>
   </interface>
 </node>

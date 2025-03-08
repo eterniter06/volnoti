@@ -28,11 +28,18 @@ typedef struct
     gint corner_radius;
 } Settings;
 
+typedef struct
+{
+    gchar *labelText;
+    gchar *labelFontAndSize;
+    gchar *labelColorRGB;
+}TextBoxData;
+
 Settings get_default_settings();
-GtkWindow *create_notification(Settings settings);
+GtkWindow *create_notification(Settings settings, TextBoxData textBoxData);
 void move_notification(GtkWindow *win, int x, int y);
 void set_notification_icon(GtkWindow *nw, GdkPixbuf *pixbuf);
-void set_progressbar_image (GtkWindow *nw, GdkPixbuf *pixbuf);
+void set_progressbar_image(GtkWindow *nw, GdkPixbuf *pixbuf);
 void destroy_notification(GtkWindow *win);
 
 #endif /* NOTIFICATION_H */

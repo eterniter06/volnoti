@@ -6,8 +6,8 @@
 # Himanshu <himanshuhimsurya@gmail.com>
 
 pkgname=volnoti
-pkgver=0.5
-pkgrel=20
+pkgver=0.6
+pkgrel=21
 pkgdesc='Lightweight volume notification'
 url=https://github.com/eterniter06/volnoti
 arch=(x86_64)

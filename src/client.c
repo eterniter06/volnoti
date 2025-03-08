@@ -32,28 +32,28 @@
 static void print_usage(const char *filename, int failure)
 {
     g_print("Usage: %s [-v] [-m] <value>\n"
-            " -h\t--help\t\thelp\n"
-            " -v\t--verbose\tverbose\n"
-            " <value>\t\tint 0-%d (%d will not show a progressbar)\n"
-            " \n"
-            " These options may be followed by an integer for the progressbar:\n"
-            " -m\t--mute\t\tvolume muted\n"
-            " -c\t--micmute\tmicrophone muted\n"
-            " -u\t--micunmute\tmicrophone unmuted\n"
-            " -p\t--custom\tcustom icon\n"
-            " Usage examples:\n"
-            " \t$ volnoti-show -m\n"
-            " \t$ volnoti-show -c 20\n"
-            " \t$ volnoti-show -p /home/chad/svgs/play.svg 20\n"
-            " Note that -p must be followed by a path and then the corresponding integer value.\n"
-            " \n"
-            " These options must be followed by a integer for the progressbar:\n"
-            " -b\t--brightness\tdisplay brightness\n"
-            " Usage examples:\n"
-            " \t$ volnoti-show -b 76\n",
-            filename, MAX_PROGRESSBAR_VALUE, MAX_PROGRESSBAR_VALUE);
+        " -h\t--help\t\thelp\n"
+        " -v\t--verbose\tverbose\n"
+        " <value>\t\tint 0-%d (%d will not show a progressbar)\n"
+        " \n"
+        " These options may be followed by an integer for the progressbar:\n"
+        " -m\t--mute\t\tvolume muted\n"
+        " -c\t--micmute\tmicrophone muted\n"
+        " -u\t--micunmute\tmicrophone unmuted\n"
+        " -p\t--custom\tcustom icon\n"
+        " Usage examples:\n"
+        " \t$ volnoti-show -m\n"
+        " \t$ volnoti-show -c 20\n"
+        " \t$ volnoti-show -p /home/chad/svgs/play.svg 20\n"
+        " Note that -p must be followed by a path and then the corresponding integer value.\n"
+        " \n"
+        " These options must be followed by a integer for the progressbar:\n"
+        " -b\t--brightness\tdisplay brightness\n"
+        " Usage examples:\n"
+        " \t$ volnoti-show -b 76\n",
+        filename, MAX_PROGRESSBAR_VALUE, MAX_PROGRESSBAR_VALUE);
 
-    if (failure)
+    if(failure)
         exit(EXIT_FAILURE);
     else
         exit(EXIT_SUCCESS);
@@ -71,52 +71,85 @@ int main(int argc, const char *argv[])
             gopt_option('u', 0, gopt_shorts('u'), gopt_longs("micunmute")),
             gopt_option('b', 0, gopt_shorts('b'), gopt_longs("brightness")),
             gopt_option('p', 0, gopt_shorts('p'), gopt_longs("custom")),
+            gopt_option('t', 0, gopt_shorts('t'), gopt_longs("text")),
+            gopt_option('x', 0, gopt_shorts('x'), gopt_longs("text-color")),
+            gopt_option('f', 0, gopt_shorts('f'), gopt_longs("font")),
             gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
 
     int help = gopt(options, 'h');
     int debug = gopt(options, 'v');
-    int muted = gopt(options, 'm') ? 1 : gopt(options, 'c') ? 2
-                                     : gopt(options, 'u')   ? 3
-                                                            : 0;
+    int muted =
+        gopt(options, 'm') ? 1
+        : gopt(options, 'c') ? 2
+        : gopt(options, 'u') ? 3
+        : 0;
     int brightness = gopt(options, 'b');
     int custom = gopt(options, 'p');
+    int text = gopt(options, 't');
+    int font = gopt(options, 'f');
+    int fontColor = gopt(options, 'x');
 
     gopt_free(options);
 
-    if (help)
+    if(help)
         print_usage(argv[0], FALSE);
 
     gint value = 0;
     char *custom_icon_path = NULL;
+    char *custom_label_text = NULL;
+    char *custom_label_font = NULL;
+    char *custom_label_color = NULL;
 
-    if (muted)
+    if(text)
     {
-        if (argc > 2)
+        if(argc >= 2)
+            custom_label_text = argv[1];
+
+        print_debug(argv[1], debug);
+    }
+    if(font)
+    {
+        if(argc >= 2)
+            custom_label_font = argv[1];
+
+        print_debug(argv[1], debug);
+    }
+    if(fontColor)
+    {
+        if(argc >= 2)
+            custom_label_color = argv[1];
+
+        print_debug(argv[1], debug);
+    }
+
+    if(muted)
+    {
+        if(argc > 2)
             print_usage(argv[0], TRUE);
 
-        else if (argc == 2)
+        else if(argc == 2)
         {
-            if (sscanf(argv[1], "%d", &value) != 1)
+            if(sscanf(argv[1], "%d", &value) != 1)
                 print_usage(argv[0], TRUE);
 
-            if (value > MAX_PROGRESSBAR_VALUE || value < 0)
+            if(value > MAX_PROGRESSBAR_VALUE || value < 0)
                 print_usage(argv[0], TRUE);
         }
         else
             value = 0;
     }
-    else if (custom)
+    else if(custom)
     {
-        if (argc != 2 && argc != 3)
+        if(argc != 2 && argc != 3)
             print_usage(argv[0], TRUE);
 
         custom_icon_path = argv[1];
-        if (argc == 3)
+        if(argc == 3)
         {
-            if (sscanf(argv[2], "%d", &value) != 1)
+            if(sscanf(argv[2], "%d", &value) != 1)
                 print_usage(argv[0], TRUE);
 
-            if (value > MAX_PROGRESSBAR_VALUE || value < 0)
+            if(value > MAX_PROGRESSBAR_VALUE || value < 0)
                 print_usage(argv[0], TRUE);
         }
 
@@ -124,15 +157,16 @@ int main(int argc, const char *argv[])
     }
     else
     {
-        if (argc != 2)
+        if(argc != 2)
             print_usage(argv[0], TRUE);
 
-        if (sscanf(argv[1], "%d", &value) != 1)
+        if(sscanf(argv[1], "%d", &value) != 1)
             print_usage(argv[0], TRUE);
 
-        if (value > MAX_PROGRESSBAR_VALUE || value < 0)
+        if(value > MAX_PROGRESSBAR_VALUE || value < 0)
             print_usage(argv[0], TRUE);
     }
+
 
     DBusGConnection *bus = NULL;
     DBusGProxy *proxy = NULL;
@@ -145,31 +179,42 @@ int main(int argc, const char *argv[])
     print_debug("Connecting to D-Bus...", debug);
     bus = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 
-    if (error != NULL)
+    if(error != NULL)
         handle_error("Couldn't connect to D-Bus",
-                     error->message,
-                     TRUE);
+            error->message,
+            TRUE);
 
     print_debug_ok(debug);
 
     // get the proxy
     print_debug("Getting proxy...", debug);
     proxy = dbus_g_proxy_new_for_name(bus,
-                                      VALUE_SERVICE_NAME,
-                                      VALUE_SERVICE_OBJECT_PATH,
-                                      VALUE_SERVICE_INTERFACE);
+        VALUE_SERVICE_NAME,
+        VALUE_SERVICE_OBJECT_PATH,
+        VALUE_SERVICE_INTERFACE);
 
-    if (proxy == NULL)
+    if(proxy == NULL)
         handle_error("Couldn't get a proxy for D-Bus",
-                     "Unknown(dbus_g_proxy_new_for_name)",
-                     TRUE);
+            "Unknown(dbus_g_proxy_new_for_name)",
+            TRUE);
 
     print_debug_ok(debug);
 
     print_debug("Sending value...", debug);
-    uk_ac_cam_db538_VolumeNotification_notify(proxy, value, muted, brightness, custom, custom_icon_path, &error);
+    uk_ac_cam_db538_VolumeNotification_notify(
+        proxy,
+        value,
+        muted,
+        brightness,
+        custom,
+        custom_icon_path,
+        custom_label_text,
+        custom_label_font,
+        custom_label_color,
+        &error
+    );
 
-    if (error != NULL)
+    if(error != NULL)
     {
         handle_error("Failed to send notification", error->message, FALSE);
         g_clear_error(&error);
