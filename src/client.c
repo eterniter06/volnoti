@@ -23,7 +23,7 @@
 #include <unistd.h>
 
 #include "common.h"
-#include "gopt.h"
+#include <unistd.h>
 
 #include "value-client-stub.h"
 
@@ -59,119 +59,96 @@ static void print_usage(const char *filename, int failure)
         exit(EXIT_SUCCESS);
 }
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
-    void *options = gopt_sort(
-        &argc,
-        argv,
-        gopt_start(
-            gopt_option('h', 0, gopt_shorts('h', '?'), gopt_longs("help", "HELP")),
-            gopt_option('m', 0, gopt_shorts('m'), gopt_longs("mute")),
-            gopt_option('c', 0, gopt_shorts('c'), gopt_longs("micmute")),
-            gopt_option('u', 0, gopt_shorts('u'), gopt_longs("micunmute")),
-            gopt_option('b', 0, gopt_shorts('b'), gopt_longs("brightness")),
-            gopt_option('p', 0, gopt_shorts('p'), gopt_longs("custom")),
-            gopt_option('t', 0, gopt_shorts('t'), gopt_longs("text")),
-            gopt_option('x', 0, gopt_shorts('x'), gopt_longs("text-color")),
-            gopt_option('f', 0, gopt_shorts('f'), gopt_longs("font")),
-            gopt_option('v', GOPT_REPEAT, gopt_shorts('v'), gopt_longs("verbose"))));
+    char *customIconPath = NULL;
+    char *customLabel = NULL;
+    char *customLabelFont = NULL;
+    char *customLabelColor = "#E6E6E6";
 
-    int help = gopt(options, 'h');
-    int debug = gopt(options, 'v');
-    int text = gopt(options, 't');
-    int font = gopt(options, 'f');
-    int fontColor = gopt(options, 'x');
+    int value = 0;
+    int valueType = VOL_UNMUTED;
+    int debug = 0;
 
-    // Only one icon can be displayed at a time
-    // So only one of these values will be active
-    // at any time
-    int valueType =
-        gopt(options, 'm') ? VOL_MUTED
-        : gopt(options, 'c') ? MIC_MUTED
-        : gopt(options, 'u') ? MIC_UNMUTED
-        : gopt(options, 'b') ? BRIGHTNESS
-        : gopt(options, 'p') ? CUSTOM
-        : VOL_UNMUTED;
+    opterr = 0;
 
-    gopt_free(options);
+    const char *options = "vhm:c:u:b:p:t:x:f:";
+    int option;
+    int iconSelected = 0;
 
-    if(help)
-        print_usage(argv[0], FALSE);
-
-    gint value = 0;
-    char *custom_icon_path = NULL;
-    char *custom_label_text = NULL;
-    char *custom_label_font = NULL;
-    char *custom_label_color = NULL;
-
-    if(text)
-    {
-        if(argc >= 2)
-            custom_label_text = argv[1];
-
-        print_debug(argv[1], debug);
-    }
-    if(font)
-    {
-        if(argc >= 2)
-            custom_label_font = argv[1];
-
-        print_debug(argv[1], debug);
-    }
-    if(fontColor)
-    {
-        if(argc >= 2)
-            custom_label_color = argv[1];
-
-        print_debug(argv[1], debug);
-    }
-
-    // Todo: Relies on implementation detail; abstract
-    if(valueType != CUSTOM && valueType < CUSTOM)
-    {
-        if(argc > 2)
-            print_usage(argv[0], TRUE);
-
-        else if(argc == 2)
+    while((option = getopt(argc, argv, options)) != -1)
+        switch(option)
         {
-            if(sscanf(argv[1], "%d", &value) != 1)
-                print_usage(argv[0], TRUE);
+            case 'm':
+                if(iconSelected)
+                    break;
+                valueType = VOL_MUTED;
+                value = atoi(optarg);
+                iconSelected = 1;
+                break;
 
-            if(value > MAX_PROGRESSBAR_VALUE || value < 0)
-                print_usage(argv[0], TRUE);
-        }
-        else
-            value = 0;
-    }
-    else if(valueType == CUSTOM)
-    {
-        if(argc != 2 && argc != 3)
-            print_usage(argv[0], TRUE);
+            case 'c':
+                if(iconSelected)
+                    break;
+                valueType = MIC_MUTED;
+                value = atoi(optarg);
+                iconSelected = 1;
+                break;
 
-        custom_icon_path = argv[1];
-        if(argc == 3)
-        {
-            if(sscanf(argv[2], "%d", &value) != 1)
-                print_usage(argv[0], TRUE);
+            case 'u':
+                if(iconSelected)
+                    break;
+                valueType = MIC_UNMUTED;
+                value = atoi(optarg);
+                iconSelected = 1;
+                break;
 
-            if(value > MAX_PROGRESSBAR_VALUE || value < 0)
-                print_usage(argv[0], TRUE);
+            case 'b':
+                if(iconSelected)
+                    break;
+                valueType = BRIGHTNESS;
+                value = atoi(optarg);
+                iconSelected = 1;
+                break;
+
+            case 'p':
+                if(iconSelected)
+                    break;
+                valueType = CUSTOM;
+                customIconPath = optarg;
+                iconSelected = 1;
+                break;
+
+            case 't':
+                customLabel = optarg;
+                break;
+
+            case 'x':
+                customLabelColor = optarg;
+                break;
+
+            case 'f':
+                customLabelFont = optarg;
+                break;
+
+            case 'v':
+                debug = 1;
+                break;
+
+            case '?':
+                print_usage(argv[0], 1);
+
+            default:
+                print_usage(argv[0], 0);
         }
 
-        print_debug(argv[1], debug);
-    }
-    else
+    if(valueType == CUSTOM || valueType == VOL_UNMUTED)
     {
-        if(argc != 2)
-            print_usage(argv[0], TRUE);
-
-        if(sscanf(argv[1], "%d", &value) != 1)
-            print_usage(argv[0], TRUE);
-
-        if(value > MAX_PROGRESSBAR_VALUE || value < 0)
-            print_usage(argv[0], TRUE);
+        // Choose the first non-optional value
+        for(int index = optind; index < argc; index++)
+            if(sscanf(argv[index], "%d", &value))
+                break;
     }
-
 
     DBusGConnection *bus = NULL;
     DBusGProxy *proxy = NULL;
@@ -211,10 +188,10 @@ int main(int argc, const char *argv[])
         proxy,
         value,
         valueType,
-        custom_icon_path,
-        custom_label_text,
-        custom_label_font,
-        custom_label_color,
+        customIconPath,
+        customLabel,
+        customLabelFont,
+        customLabelColor,
         &error
     );
 

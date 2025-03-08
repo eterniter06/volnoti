@@ -540,7 +540,7 @@ GtkWindow *create_notification(Settings settings, TextBoxData textBoxData)
     gtk_container_add(GTK_CONTAINER(windata->progressbarbox), windata->progressbar);
 
     // textbox & text
-    if(textBoxData.labelText != NULL)
+    if(textBoxData.labelText != NULL && strlen(textBoxData.labelText) != 0)
     {
         // TextBox
         GtkWidget *textBox = gtk_alignment_new(0.5f, 0, 0, 0);
