@@ -78,16 +78,20 @@ int main(int argc, const char *argv[])
 
     int help = gopt(options, 'h');
     int debug = gopt(options, 'v');
-    int muted =
-        gopt(options, 'm') ? 1
-        : gopt(options, 'c') ? 2
-        : gopt(options, 'u') ? 3
-        : 0;
-    int brightness = gopt(options, 'b');
-    int custom = gopt(options, 'p');
     int text = gopt(options, 't');
     int font = gopt(options, 'f');
     int fontColor = gopt(options, 'x');
+
+    // Only one icon can be displayed at a time
+    // So only one of these values will be active
+    // at any time
+    int valueType =
+        gopt(options, 'm') ? VOL_MUTED
+        : gopt(options, 'c') ? MIC_MUTED
+        : gopt(options, 'u') ? MIC_UNMUTED
+        : gopt(options, 'b') ? BRIGHTNESS
+        : gopt(options, 'p') ? CUSTOM
+        : VOL_UNMUTED;
 
     gopt_free(options);
 
@@ -122,7 +126,8 @@ int main(int argc, const char *argv[])
         print_debug(argv[1], debug);
     }
 
-    if(muted)
+    // Todo: Relies on implementation detail; abstract
+    if(valueType != CUSTOM && valueType < CUSTOM)
     {
         if(argc > 2)
             print_usage(argv[0], TRUE);
@@ -138,7 +143,7 @@ int main(int argc, const char *argv[])
         else
             value = 0;
     }
-    else if(custom)
+    else if(valueType == CUSTOM)
     {
         if(argc != 2 && argc != 3)
             print_usage(argv[0], TRUE);
@@ -201,12 +206,11 @@ int main(int argc, const char *argv[])
     print_debug_ok(debug);
 
     print_debug("Sending value...", debug);
+
     uk_ac_cam_db538_VolumeNotification_notify(
         proxy,
         value,
-        muted,
-        brightness,
-        custom,
+        valueType,
         custom_icon_path,
         custom_label_text,
         custom_label_font,

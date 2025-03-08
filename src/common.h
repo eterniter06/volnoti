@@ -24,9 +24,12 @@
 /* And we're interested in using it through this interface.
    This must match the entry in the interface definition XML. */
 #define VALUE_SERVICE_INTERFACE   "uk.ac.cam.db538.VolumeNotification"
+#define VOL_UNMUTED 0
 #define VOL_MUTED 1
 #define MIC_MUTED 2
 #define MIC_UNMUTED 3
+#define BRIGHTNESS 4
+#define CUSTOM 5
 
 void handle_error(const char *msg, const char *reason, gboolean fatal);
 void print_debug(const gchar *msg, int debug);

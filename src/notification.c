@@ -511,12 +511,6 @@ GtkWindow *create_notification(Settings settings, TextBoxData textBoxData)
     gtk_container_add(GTK_CONTAINER(win), windata->main_vbox);
     gtk_container_set_border_width(GTK_CONTAINER(windata->main_vbox), DEFAULT_BORDER);
 
-    //    windata->main_hbox = gtk_hbox_new (FALSE, 0);
-    //    gtk_widget_show (windata->main_hbox);
-    //    gtk_box_pack_start (GTK_BOX (main_vbox),
-    //                        windata->main_hbox,
-    //                        FALSE, FALSE, 0);
-
     // icon box
     windata->iconbox = gtk_alignment_new(0.5f, 0, 0, 0);
     gtk_widget_show(windata->iconbox);
@@ -548,7 +542,6 @@ GtkWindow *create_notification(Settings settings, TextBoxData textBoxData)
     // textbox & text
     if(textBoxData.labelText != NULL)
     {
-        printf("Why am I here");
         // TextBox
         GtkWidget *textBox = gtk_alignment_new(0.5f, 0, 0, 0);
         gtk_widget_show(textBox);

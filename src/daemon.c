@@ -31,12 +31,8 @@ typedef struct
 {
     GObject parent;
 
-    gint volume;
-    gboolean muted;
-    gboolean micmuted;
-    gboolean micunmuted;
-    gboolean brightness;
-    gboolean custom;
+    gint value;
+    gint valueType;
 
     GtkWindow *notification;
 
@@ -68,10 +64,8 @@ typedef struct
 
 GType volume_object_get_type(void);
 gboolean volume_object_notify(VolumeObject *obj,
-    gint value_in,
-    gboolean muted,
-    gboolean brightness,
-    gboolean custom,
+    gint value,
+    gint valueType,
     gchar *custom_icon_path,
     gchar *custom_label_text,
     gchar *custom_label_font_family_and_size,
@@ -139,11 +133,46 @@ time_handler(VolumeObject *obj)
     return TRUE;
 }
 
+GdkPixbuf *getNotificationIconFromValueType(gint valueType, gint value, gchar *custom_icon_path, VolumeObject *obj)
+{
+    switch(valueType)
+    {
+        case CUSTOM:
+            GError *local_error = NULL;
+            GdkPixbuf *custom_icon = gdk_pixbuf_new_from_file(custom_icon_path, &local_error);
+
+            if(local_error != NULL)
+                handle_error("Couldn't load custom icon.", local_error->message, TRUE);
+
+            return custom_icon;
+
+        case BRIGHTNESS:
+            return obj->icon_brightness;
+
+        case VOL_MUTED:
+            return obj->icon_muted;
+
+        case MIC_MUTED:
+            return obj->icon_micmuted;
+
+        case MIC_UNMUTED:
+            return obj->icon_micon;
+
+        case VOL_UNMUTED:
+            return
+                value > 75 ? obj->icon_high
+                : value >= 50 ? obj->icon_medium
+                : value >= 25 ? obj->icon_low
+                : obj->icon_off;
+
+        default:
+            return obj->icon_off;
+    }
+}
+
 gboolean volume_object_notify(VolumeObject *obj,
     gint value,
-    gboolean muted,
-    gboolean brightness,
-    gboolean custom,
+    gint valueType,
     gchar *custom_icon_path,
     gchar *custom_label_text,
     gchar *custom_label_font_family_and_size,
@@ -152,33 +181,12 @@ gboolean volume_object_notify(VolumeObject *obj,
 {
     g_assert(obj != NULL);
 
-    if(muted == VOL_MUTED)
-    {
-        obj->muted = TRUE;
-        obj->micmuted = FALSE;
-        obj->micunmuted = FALSE;
-    }
-    else if(muted == MIC_MUTED)
-    {
-        obj->muted = FALSE;
-        obj->micunmuted = FALSE;
-        obj->micmuted = TRUE;
-    }
-    else if(muted == MIC_UNMUTED)
-    {
-        obj->muted = FALSE;
-        obj->micunmuted = TRUE;
-        obj->micmuted = FALSE;
-    }
-    else
-    {
-        obj->muted = FALSE;
-        obj->micmuted = FALSE;
-        obj->micunmuted = FALSE;
-    }
-
-    obj->brightness = brightness ? TRUE : FALSE;
-    obj->volume = value;
+    gboolean myuted = valueType == VOL_MUTED;
+    gboolean micmuted = valueType == MIC_MUTED;
+    gboolean micunmuted = valueType == MIC_UNMUTED;
+    gboolean brightness = valueType == BRIGHTNESS;
+    gboolean custom = valueType == CUSTOM;
+    obj->value = value;
 
     if(obj->notification == NULL)
     {
@@ -195,43 +203,15 @@ gboolean volume_object_notify(VolumeObject *obj,
         print_debug_ok(obj->debug);
     }
 
-    gboolean show_progressbar = TRUE;
+    GdkPixbuf *notificationIcon = getNotificationIconFromValueType(valueType, value, custom_icon_path, obj);
+    set_notification_icon(GTK_WINDOW(obj->notification), notificationIcon);
 
-    // choose icon
-    if(custom)
-    {
-        GError *local_error = NULL;
-        GdkPixbuf *custom_icon = gdk_pixbuf_new_from_file(custom_icon_path, &local_error);
-
-        if(local_error != NULL)
-            handle_error("Couldn't load custom icon.", local_error->message, TRUE);
-
-        set_notification_icon(GTK_WINDOW(obj->notification), custom_icon);
-    }
-    else if(obj->brightness)
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_brightness);
-    else if(obj->muted)
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_muted);
-    else if(obj->micmuted)
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_micmuted);
-    else if(obj->micunmuted)
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_micon);
-    else if(obj->volume >= 75)
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_high);
-    else if(obj->volume >= 50)
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_medium);
-    else if(obj->volume >= 25)
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_low);
-    else
-        set_notification_icon(GTK_WINDOW(obj->notification), obj->icon_off);
-
-    if(obj->volume < 0 || obj->volume > 100)
-        show_progressbar = FALSE;
+    gboolean show_progressbar = obj->value >= 0 && obj->value <= 100;
 
     // prepare and set progress bar
     if(show_progressbar)
     {
-        gint width_full = obj->width_progressbar * obj->volume / 100;
+        gint width_full = obj->width_progressbar * obj->value / 100;
 
         gdk_pixbuf_copy_area(
             obj->image_progressbar_full,
@@ -265,6 +245,7 @@ gboolean volume_object_notify(VolumeObject *obj,
 
     return TRUE;
 }
+
 
 static void print_usage(const char *filename, int failure)
 {
