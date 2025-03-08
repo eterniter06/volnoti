@@ -32,25 +32,33 @@
 static void print_usage(const char *filename, int failure)
 {
     g_print("Usage: %s [-v] [-m] <value>\n"
-        " -h\t--help\t\thelp\n"
-        " -v\t--verbose\tverbose\n"
-        " <value>\t\tint 0-%d (%d will not show a progressbar)\n"
-        " \n"
-        " These options may be followed by an integer for the progressbar:\n"
-        " -m\t--mute\t\tvolume muted\n"
-        " -c\t--micmute\tmicrophone muted\n"
-        " -u\t--micunmute\tmicrophone unmuted\n"
-        " -p\t--custom\tcustom icon\n"
+        " -h\thelp\n"
+        " -v\tverbose\n"
+
+        " \nThese options must be followed by an integer for the progressbar:\n"
+        " -m\tvolume muted\n"
+        " -c\tmicrophone muted\n"
+        " -u\tmicrophone unmuted\n"
+        " -b\tdisplay brightness\n"
         " Usage examples:\n"
         " \t$ volnoti-show -m\n"
         " \t$ volnoti-show -c 20\n"
+        " \t$ volnoti-show -b 76\n"
+        " Note that the maximum progressbar value is %d, which will show no progressbar at all.\n"
+        " The maximum value while showing the progressbar is 100.\n"
+
+        " \n Custom icon option requires a valid path to the icon for its argument, and then optionally a progressbar value:\n"
+        " -p\tcustom icon\n"
+        " Usage example:\n"
         " \t$ volnoti-show -p /home/chad/svgs/play.svg 20\n"
-        " Note that -p must be followed by a path and then the corresponding integer value.\n"
-        " \n"
-        " These options must be followed by a integer for the progressbar:\n"
-        " -b\t--brightness\tdisplay brightness\n"
-        " Usage examples:\n"
-        " \t$ volnoti-show -b 76\n",
+
+        " \nOptions for the label beneath the progressbar:\n"
+        " -t\tCustom label text\n"
+        " -f\tFont family and size for the label\n"
+        " -x\tFont color for the label\n"
+        " Usage example:\n"
+        " \t$ volnoti-show -p /home/chad/svgs/play.svg -t \"Can you feel my heart\" -f \"Fira Code 8\" -x \"#FFFFFF\" 20\n"
+        " Note: The default label color is #E6E6E6\n",
         filename, MAX_PROGRESSBAR_VALUE, MAX_PROGRESSBAR_VALUE);
 
     if(failure)
