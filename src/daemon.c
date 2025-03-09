@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <glib.h>
 #include <dbus/dbus-glib.h>
 
@@ -241,6 +242,33 @@ static void print_usage(const char *filename, int failure)
         exit(EXIT_SUCCESS);
 }
 
+GdkPixbuf *createPixbufFromFilename(const char *filename)
+{
+#define FILENAMELENGTH 513
+    char filePath[FILENAMELENGTH];
+    filePath[0] = '\0';
+    strncat(filePath, IMAGE_PATH, FILENAMELENGTH - 1);
+    strncat(filePath, filename, FILENAMELENGTH - 1);
+#undef FILENAMELENGTH
+
+    GError *error = NULL;
+    GdkPixbuf *icon = gdk_pixbuf_new_from_file(filePath, &error);
+
+    if(error)
+    {
+#define ERRORMSGLEN 513
+        char failedLoadMessage[ERRORMSGLEN];
+        failedLoadMessage[0] = '\0';
+        strncat(failedLoadMessage, "Couldn't load ", ERRORMSGLEN - 1);
+        strncat(failedLoadMessage, filePath, ERRORMSGLEN - 1);
+        strncat(failedLoadMessage, ".", ERRORMSGLEN - 1);
+#undef ERRORMSGLEN
+
+        handle_error(failedLoadMessage, error->message, TRUE);
+    }
+    return icon;
+}
+
 int main(int argc, char *argv[])
 {
     Settings settings = get_default_settings();
@@ -360,57 +388,18 @@ int main(int argc, char *argv[])
     status->timeout = timeout;
     status->settings = settings;
 
-    // volume icons
-    status->icon_high = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_high.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load volume_high.svg.", error->message, TRUE);
-
-    status->icon_medium = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_medium.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load volume_medium.svg.", error->message, TRUE);
-
-    status->icon_low = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_low.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load volume_low.svg.", error->message, TRUE);
-
-    status->icon_off = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_off.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load volume_off.svg.", error->message, TRUE);
-
-    status->icon_muted = gdk_pixbuf_new_from_file(IMAGE_PATH "volume_muted.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load volume_muted.svg.", error->message, TRUE);
-
-    status->icon_micmuted = gdk_pixbuf_new_from_file(IMAGE_PATH "mic_muted.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load mic_muted.svg.", error->message, TRUE);
-
-    status->icon_micon = gdk_pixbuf_new_from_file(IMAGE_PATH "mic_on.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load mic_on.svg.", error->message, TRUE);
-
-    status->icon_brightness = gdk_pixbuf_new_from_file(IMAGE_PATH "brightness.svg", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load brightness.svg.", error->message, TRUE);
+    status->icon_high = createPixbufFromFilename("volume_high.svg");
+    status->icon_medium = createPixbufFromFilename("volume_medium.svg");
+    status->icon_low = createPixbufFromFilename("volume_low.svg");
+    status->icon_off = createPixbufFromFilename("volume_off.svg");
+    status->icon_muted = createPixbufFromFilename("volume_muted.svg");
+    status->icon_micmuted = createPixbufFromFilename("mic_muted.svg");
+    status->icon_micon = createPixbufFromFilename("mic_on.svg");
+    status->icon_brightness = createPixbufFromFilename("brightness.svg");
 
     // progress bar
-    status->image_progressbar_empty = gdk_pixbuf_new_from_file(IMAGE_PATH "progressbar_empty.png", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load progressbar_empty.png.", error->message, TRUE);
-
-    status->image_progressbar_full = gdk_pixbuf_new_from_file(IMAGE_PATH "progressbar_full.png", &error);
-
-    if(error != NULL)
-        handle_error("Couldn't load progressbar_full.png.", error->message, TRUE);
+    status->image_progressbar_empty = createPixbufFromFilename("progressbar_empty.png");
+    status->image_progressbar_full = createPixbufFromFilename("progressbar_full.png");
 
     // check that the images are of the same size
     if(gdk_pixbuf_get_width(status->image_progressbar_empty) != gdk_pixbuf_get_width(status->image_progressbar_full) ||
