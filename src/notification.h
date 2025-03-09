@@ -61,6 +61,7 @@ typedef struct
 
     gint time_left;
     gint timeout;
+    guint timeoutSourceId;
     gboolean debug;
     Settings settings;
 } VolumeObject;
