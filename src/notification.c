@@ -591,10 +591,11 @@ move_notification(GtkWindow *win, int x, int y)
 void
 destroyNotification(VolumeObject *obj)
 {
-    if(obj->notification != NULL)
+    if(obj && obj->notification)
     {
         print_debug("Destroying notification...", obj->debug);
         gtk_widget_destroy(GTK_WIDGET(obj->notification));
+        g_source_remove(obj->timeoutSourceId);
         obj->notification = NULL;
     }
 }

@@ -151,12 +151,7 @@ gboolean volume_object_notify(VolumeObject *obj,
 {
     g_assert(obj != NULL);
 
-    if(lastNotification != NULL)
-    {
-        if(lastNotification->notification != NULL)
-            destroyNotification(lastNotification);
-    }
-
+    destroyNotification(lastNotification);
     lastNotification = obj;
 
     gboolean myuted = valueType == VOL_MUTED;
@@ -164,6 +159,7 @@ gboolean volume_object_notify(VolumeObject *obj,
     gboolean micunmuted = valueType == MIC_UNMUTED;
     gboolean brightness = valueType == BRIGHTNESS;
     gboolean custom = valueType == CUSTOM;
+    obj->valueType = valueType;
     obj->value = value;
 
     if(obj->notification == NULL)
@@ -177,7 +173,7 @@ gboolean volume_object_notify(VolumeObject *obj,
 
         obj->notification = create_notification(obj->settings, textBoxData);
         gtk_widget_realize(GTK_WIDGET(obj->notification));
-        g_timeout_add(100, (GSourceFunc) time_handler, (gpointer) obj);
+        obj->timeoutSourceId = g_timeout_add(100, (GSourceFunc) time_handler, (gpointer) obj);
         print_debug_ok(obj->debug);
     }
 
