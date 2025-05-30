@@ -180,6 +180,9 @@ gboolean volume_object_notify(VolumeObject *obj,
 
     GdkPixbuf *notificationIcon = getNotificationIconFromValueType(valueType, value, custom_icon_path, obj);
     set_notification_icon(GTK_WINDOW(obj->notification), notificationIcon);
+    if (valueType == CUSTOM) {
+        g_object_unref(notificationIcon);
+    }
 
     gboolean show_progressbar = obj->value >= 0 && obj->value <= 100;
 
